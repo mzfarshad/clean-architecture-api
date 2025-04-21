@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/joho/godotenv"
-	"github.com/mzfarshad/music_store_api/models"
+	"github.com/mzfarshad/music_store_api/internal/models"
 )
 
 func init() {
