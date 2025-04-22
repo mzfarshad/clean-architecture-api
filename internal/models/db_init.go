@@ -19,5 +19,16 @@ func NewPostgresConnection() (*gorm.DB, error) {
 
 		return nil, err
 	}
+	if err := db.AutoMigrate(
+		&User{},
+		// ...
+	); err != nil {
+		err = apperr.NewAppErr(
+			apperr.StatusInternalServerError,
+			"faield auto migrate, ",
+			apperr.TypeDatabase,
+			err.Error())
+		return nil, err
+	}
 	return db, nil
 }
