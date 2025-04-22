@@ -2,6 +2,7 @@ package apperr
 
 // type error
 const (
+	TypeApi        = "API"
 	TypeInternal   = "INTERNAL"
 	TypeValidation = "VALIDATION"
 	TypeDatabase   = "DATABASE"
@@ -16,4 +17,8 @@ const (
 	StatusForbidden           = 403
 	StatusNotFound            = 404
 	StatusInternalServerError = 500
+)
+
+const (
+	ErrRecordNotFound = "record not found"
 )
