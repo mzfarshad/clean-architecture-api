@@ -16,7 +16,7 @@ type postgres struct {
 	Pass string
 }
 
-func FromEnv() (*postgres, error) {
+func fromEnv() (*postgres, error) {
 	p := new(postgres)
 	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
 	if err != nil {
