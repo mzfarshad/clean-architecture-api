@@ -20,6 +20,8 @@ type Option struct {
 type opt func(*Option)
 
 func (l *logger) Conf(setup opt) {
+	l.Mutex.Lock()
+	defer l.Mutex.Unlock()
 	setup(l.Config)
 }
 

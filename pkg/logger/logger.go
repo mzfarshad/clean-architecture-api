@@ -36,7 +36,7 @@ func GetLogger(ctx context.Context) *logger {
 	return nil
 }
 
-func NewLogger(logLevel string) (*logger, error) {
+func newLogger(logLevel string) (*logger, error) {
 	// checking for existance of the log directory
 	if _, err := os.Stat("logs"); os.IsNotExist(err) {
 		if err := os.Mkdir("logs", 0755); err != nil {
@@ -78,6 +78,27 @@ func NewLogger(logLevel string) (*logger, error) {
 		Writer:   writer,
 		Config:   opt,
 	}, nil
+}
+
+var once sync.Once
+var instance *logger
+
+func Get(level string) *logger {
+	once.Do(
+		func() {
+			l, err := newLogger(level)
+			if err != nil {
+				customeErr := apperr.NewAppErr(
+					apperr.StatusInternalServerError,
+					"faield make logger",
+					apperr.TypeInternal,
+					err.Error(),
+				)
+				log.Fatal(customeErr)
+			}
+			instance = l
+		})
+	return instance
 }
 
 func (l *logger) Log(ctx context.Context, level, message string, err error) {
