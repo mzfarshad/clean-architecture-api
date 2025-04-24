@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/mzfarshad/music_store_api/internal/api/handler/user"
+	"github.com/mzfarshad/music_store_api/internal/api/middleware"
 	"github.com/mzfarshad/music_store_api/internal/models"
 )
 
@@ -27,6 +28,7 @@ func main() {
 	fmt.Println("Successfully connect to postgres")
 
 	router := gin.Default()
+	router.Use(middleware.LoggerMiddleware())
 	auth := router.Group(userSignUp)
 
 	auth.POST("/signup", user.SignUp)

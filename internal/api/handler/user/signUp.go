@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -8,11 +9,15 @@ import (
 	authuser "github.com/mzfarshad/music_store_api/internal/service/auth_user"
 	apperr "github.com/mzfarshad/music_store_api/pkg/appErr"
 	"github.com/mzfarshad/music_store_api/pkg/jwt"
+	"github.com/mzfarshad/music_store_api/pkg/logger"
 )
 
 func SignUp(c *gin.Context) {
-	var req presenter.SignUpUser
+
 	ctx := c.Request.Context()
+	log := logger.GetLogger(ctx)
+	log.Info(ctx, "Starting user sign up", nil)
+	var req presenter.SignUpUser
 	if err := c.ShouldBindJSON(&req); err != nil {
 		customErr := apperr.NewAppErr(
 			apperr.StatusBadRequest,
@@ -54,6 +59,6 @@ func SignUp(c *gin.Context) {
 			return
 		}
 	}
-
+	log.Info(ctx, fmt.Sprintf("Successfully sign up user with user_id %d", newUser.ID), nil)
 	c.IndentedJSON(http.StatusOK, gin.H{"token": token})
 }
