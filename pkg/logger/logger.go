@@ -101,7 +101,7 @@ func Get(level string) *logger {
 	return instance
 }
 
-func (l *logger) Log(ctx context.Context, level, message string, err error) {
+func (l *logger) log(ctx context.Context, level, message string, err error) {
 	l.Mutex.Lock()
 	defer l.Mutex.Unlock()
 
@@ -149,27 +149,27 @@ func (l *logger) Log(ctx context.Context, level, message string, err error) {
 }
 
 func (l *logger) Debug(ctx context.Context, message string, err error) {
-	l.Log(ctx, "DEBUG", message, err)
+	l.log(ctx, "DEBUG", message, err)
 }
 
 func (l *logger) Info(ctx context.Context, message string, err error) {
-	l.Log(ctx, "INFO", message, err)
+	l.log(ctx, "INFO", message, err)
 }
 
 func (l *logger) Warn(ctx context.Context, message string, err error) {
-	l.Log(ctx, "WARN", message, err)
+	l.log(ctx, "WARN", message, err)
 }
 
 func (l *logger) Error(ctx context.Context, message string, err error) {
-	l.Log(ctx, "ERROR", message, err)
+	l.log(ctx, "ERROR", message, err)
 }
 
 func (l *logger) Fatal(ctx context.Context, message string, err error) {
-	l.Log(ctx, "FATAL", message, err)
+	l.log(ctx, "FATAL", message, err)
 	os.Exit(1)
 }
 
 func (l *logger) Panic(ctx context.Context, message string, err error) {
-	l.Log(ctx, "PANIC", message, err)
+	l.log(ctx, "PANIC", message, err)
 	panic(err)
 }
