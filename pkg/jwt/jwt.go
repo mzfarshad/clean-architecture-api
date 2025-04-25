@@ -1,15 +1,19 @@
 package jwt
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/mzfarshad/music_store_api/internal/conf"
 	apperr "github.com/mzfarshad/music_store_api/pkg/appErr"
+	"github.com/mzfarshad/music_store_api/pkg/logger"
 )
 
 type TokenUser struct {
 	Email    string
 	UserType string
-	id       uint
+	ID       uint
 }
 
 func NewAccessToken(email, userType string, id uint) (string, error) {
@@ -30,4 +34,34 @@ func NewAccessToken(email, userType string, id uint) (string, error) {
 		return "", customErr
 	}
 	return tokenStr, nil
+}
+
+func ValidateToken(ctx context.Context, tkn string) (*TokenUser, bool) {
+	tokenUser := &TokenUser{}
+	token, err := jwt.Parse(tkn, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+		}
+		return []byte(conf.Get().JWT().SecretKey), nil
+	})
+	if err != nil {
+		log := logger.GetLogger(ctx)
+		customErr := apperr.NewAppErr(
+			apperr.StatusInternalServerError,
+			"failed validate token",
+			apperr.TypeApi,
+			err.Error(),
+		)
+		log.Error(ctx, "", customErr)
+		return nil, false
+	}
+	if claim, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		tokenUser.Email = (claim["email"]).(string)
+		tokenUser.UserType = (claim["user_type"]).(string)
+		userID := (claim["id"]).(float64)
+		tokenUser.ID = uint(userID)
+		return tokenUser, true
+	}
+
+	return nil, false
 }

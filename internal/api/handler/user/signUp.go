@@ -26,7 +26,7 @@ func SignUp(c *gin.Context) {
 			err.Error(),
 		)
 		log.Error(ctx, "", customErr)
-		c.IndentedJSON(customErr.Code, customErr)
+		c.IndentedJSON(customErr.Code, gin.H{"Message": "invalid body"})
 		return
 	}
 
@@ -36,7 +36,7 @@ func SignUp(c *gin.Context) {
 		if customErr, ok := err.(*apperr.CustomErr); ok {
 			if customErr.Message != authuser.NotFoundEmail {
 				log.Error(ctx, "", customErr)
-				c.IndentedJSON(customErr.Code, customErr)
+				c.IndentedJSON(customErr.Code, gin.H{"Message": "something wrong try again"})
 				return
 			}
 		}
@@ -64,5 +64,5 @@ func SignUp(c *gin.Context) {
 		}
 	}
 	log.Info(ctx, fmt.Sprintf("Successfully sign up user with user_id %d", newUser.ID), nil)
-	c.IndentedJSON(http.StatusOK, gin.H{"token": token})
+	c.IndentedJSON(http.StatusOK, gin.H{"Token": token})
 }
