@@ -16,8 +16,8 @@ import (
 var ErrNotFoundEmail = errors.New("not found email")
 
 type AuthUserRepository interface {
-	FindEmail(ctx context.Context, email string) (models.User, error)
-	SaveUser(ctx context.Context, user presenter.SignUpUser) error
+	FindEmail(ctx context.Context, email string) (*models.User, error)
+	SaveUser(ctx context.Context, user *presenter.SignUpUser) error
 }
 
 type authUserRepo struct {
@@ -28,31 +28,37 @@ func NewAuthUserRepo(db *gorm.DB) AuthUserRepository {
 	return &authUserRepo{db: db}
 }
 
-func (a *authUserRepo) FindEmail(ctx context.Context, email string) (models.User, error) {
+func (a *authUserRepo) FindEmail(ctx context.Context, email string) (*models.User, error) {
 	log := logger.GetLogger(ctx)
 	var user models.User
-	result := a.db.WithContext(ctx).Where("email = ?", email).Debug().First(&user)
-	if result.Error != nil {
-		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			customeErr := apperr.NewAppErr(
+	err := a.db.WithContext(ctx).Where("email = ?", email).Debug().First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			customErr := apperr.NewAppErr(
 				apperr.StatusNotFound,
 				ErrNotFoundEmail.Error(),
 				apperr.TypeDatabase,
-				result.Error.Error(),
+				err.Error(),
 			)
-			log.Error(ctx, customeErr.Message, result.Error)
-			return models.User{}, customeErr
+			log.Error(ctx, "", customErr)
+			return nil, customErr
 		}
-		log.Error(ctx, fmt.Sprintf("failed find email %s", email), result.Error)
-		return models.User{}, result.Error
+		customErr := apperr.NewAppErr(
+			apperr.StatusInternalServerError,
+			fmt.Sprintf("failed find email %s", email),
+			apperr.TypeDatabase,
+			err.Error(),
+		)
+		log.Error(ctx, "", err)
+		return nil, customErr
 	}
-	return user, nil
+	return &user, nil
 }
 
-func (a *authUserRepo) SaveUser(ctx context.Context, user presenter.SignUpUser) error {
+func (a *authUserRepo) SaveUser(ctx context.Context, user *presenter.SignUpUser) error {
 	log := logger.GetLogger(ctx)
 	newUser := new(models.User)
-	pass, err := hashPass(user.Password)
+	pass, err := hashPass(ctx, user.Password)
 	if err != nil {
 		log.Error(ctx, "", err)
 		return err
@@ -60,13 +66,13 @@ func (a *authUserRepo) SaveUser(ctx context.Context, user presenter.SignUpUser) 
 	newUser.Email = user.Email
 	newUser.Password = pass
 	newUser.Name = user.Name
-	result := a.db.WithContext(ctx).Debug().Save(&newUser)
-	if result.Error != nil {
+	err = a.db.WithContext(ctx).Debug().Save(&newUser).Error
+	if err != nil {
 		customErr := apperr.NewAppErr(
 			apperr.StatusInternalServerError,
 			fmt.Sprintf("failed save user by email: %s", user.Email),
 			apperr.TypeDatabase,
-			result.Error.Error(),
+			err.Error(),
 		)
 		log.Error(ctx, "", customErr)
 		return customErr
@@ -74,16 +80,18 @@ func (a *authUserRepo) SaveUser(ctx context.Context, user presenter.SignUpUser) 
 	return nil
 }
 
-func hashPass(pass string) (string, error) {
+func hashPass(ctx context.Context, pass string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(pass), 16)
 	if err != nil {
-		customeErr := apperr.NewAppErr(
+		customErr := apperr.NewAppErr(
 			apperr.StatusInternalServerError,
 			"failed hashing password, ",
 			apperr.TypeInternal,
 			err.Error(),
 		)
-		return "", customeErr
+		log := logger.GetLogger(ctx)
+		log.Error(ctx, "", customErr)
+		return "", customErr
 	}
 	return string(hash), nil
 }

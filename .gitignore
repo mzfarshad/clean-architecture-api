@@ -27,4 +27,4 @@ go.work.sum
 .env
 
 # log file
-*.log
+logs/

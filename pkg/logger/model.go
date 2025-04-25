@@ -2,7 +2,9 @@ package logger
 
 import (
 	"bufio"
+	"io"
 	"log"
+	"os"
 
 	apperr "github.com/mzfarshad/music_store_api/pkg/appErr"
 )
@@ -19,8 +21,16 @@ type logPrint struct {
 	ErrorDetails string `json:"error_details,omitempty"`
 }
 
-func writeToFile(data string, writer *bufio.Writer) {
-	if _, err := writer.WriteString(data); err != nil {
+func writeToFile(data string, writer *bufio.Writer, alsoStdout bool) {
+	var outputWriter *bufio.Writer
+	if alsoStdout {
+		multi := io.MultiWriter(writer, os.Stdout)
+		outputWriter = bufio.NewWriter(multi)
+	} else {
+		outputWriter = writer
+	}
+
+	if _, err := outputWriter.WriteString(data); err != nil {
 		customErr := apperr.NewAppErr(
 			apperr.StatusInternalServerError,
 			"failed write to bufio Log function in logger package",
@@ -29,7 +39,7 @@ func writeToFile(data string, writer *bufio.Writer) {
 		)
 		log.Fatal(customErr)
 	}
-	if err := writer.Flush(); err != nil {
+	if err := outputWriter.Flush(); err != nil {
 		customErr := apperr.NewAppErr(
 			apperr.StatusInternalServerError,
 			"failed flush log to logs/app.log file",

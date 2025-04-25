@@ -33,14 +33,15 @@ func SignUp(c *gin.Context) {
 	repo := authuser.NewAuthUserService()
 
 	if _, err := repo.FindEmail(ctx, req.Email); err != nil {
-		if customeErr, ok := err.(*apperr.CustomErr); ok {
-			if customeErr.Details != apperr.ErrRecordNotFound {
-				c.IndentedJSON(customeErr.Code, customeErr)
+		if customErr, ok := err.(*apperr.CustomErr); ok {
+			if customErr.Message != authuser.NotFoundEmail {
+				log.Error(ctx, "", customErr)
+				c.IndentedJSON(customErr.Code, customErr)
 				return
 			}
 		}
 	}
-	if err := repo.SaveUser(ctx, req); err != nil {
+	if err := repo.SaveUser(ctx, &req); err != nil {
 		if customeErr, ok := err.(*apperr.CustomErr); ok {
 			c.IndentedJSON(customeErr.Code, customeErr)
 			return
@@ -48,16 +49,17 @@ func SignUp(c *gin.Context) {
 	}
 	newUser, err := repo.FindEmail(ctx, req.Email)
 	if err != nil {
-		if customeErr, ok := err.(*apperr.CustomErr); ok {
-			c.IndentedJSON(customeErr.Code, customeErr)
+		if customErr, ok := err.(*apperr.CustomErr); ok {
+			log.Error(ctx, "", customErr)
+			c.IndentedJSON(customErr.Code, customErr)
 			return
 		}
 	}
 	token, err := jwt.NewAccessToken(newUser.Email, string(newUser.Type), newUser.ID)
 	if err != nil {
-		if customeErr, ok := err.(*apperr.CustomErr); ok {
-			log.Error(ctx, "", customeErr)
-			c.IndentedJSON(customeErr.Code, customeErr)
+		if customErr, ok := err.(*apperr.CustomErr); ok {
+			log.Error(ctx, "", customErr)
+			c.IndentedJSON(customErr.Code, customErr)
 			return
 		}
 	}

@@ -53,7 +53,6 @@ func applyOption(requestId, level string, option Option) (*logPrint, error) {
 	if option.ShowLine {
 		logEty.Line = fmt.Sprintf("Line: %d ", line)
 	}
-
 	return logEty, nil
 }
 

@@ -18,10 +18,14 @@ func NewAuthUserService() *authUserService {
 	return &authUserService{Repo: repo}
 }
 
-func (a *authUserService) FindEmail(ctx context.Context, email string) (models.User, error) {
+const (
+	NotFoundEmail = "not found email"
+)
+
+func (a *authUserService) FindEmail(ctx context.Context, email string) (*models.User, error) {
 	return a.Repo.FindEmail(ctx, email)
 }
 
-func (a *authUserService) SaveUser(ctx context.Context, user presenter.SignUpUser) error {
+func (a *authUserService) SaveUser(ctx context.Context, user *presenter.SignUpUser) error {
 	return a.Repo.SaveUser(ctx, user)
 }

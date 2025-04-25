@@ -32,5 +32,6 @@ func main() {
 	auth := router.Group(userSignUp)
 
 	auth.POST("/signup", user.SignUp)
+	auth.POST("/signin", user.SignIn)
 	router.Run("localhost:8080")
 }

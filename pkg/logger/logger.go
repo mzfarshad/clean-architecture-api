@@ -109,8 +109,8 @@ func (l *logger) log(ctx context.Context, level, message string, err error) {
 	if reqID := ctx.Value("requestID"); reqID != nil {
 		requestID = reqID.(string)
 	}
-	logData, err := applyOption(requestID, level, *l.Config)
-	if err != nil {
+	logData, errApply := applyOption(requestID, level, *l.Config)
+	if errApply != nil {
 		customErr := apperr.NewAppErr(
 			apperr.StatusForbidden,
 			"failed set option into logger",
@@ -119,21 +119,16 @@ func (l *logger) log(ctx context.Context, level, message string, err error) {
 		)
 		log.Fatal(customErr)
 	}
-
+	if message != "" {
+		logData.Message = message
+	}
 	if err != nil {
 		if customErr, ok := err.(*apperr.CustomErr); ok {
-			logData.Message = message
 			logData.ErrorMessage = customErr.Message
 			logData.ErrorDetails = customErr.Details
 
-		} else {
-			logData.Message = message
-			logData.ErrorMessage = err.Error()
 		}
-	} else {
-		logData.Message = message
 	}
-
 	jsonLogData, err := json.MarshalIndent(&logData, "", "  ")
 	if err != nil {
 		customErr := apperr.NewAppErr(
@@ -145,7 +140,8 @@ func (l *logger) log(ctx context.Context, level, message string, err error) {
 		log.Fatal(customErr)
 	}
 	strLogData := string(jsonLogData) + "\n"
-	writeToFile(strLogData, l.Writer)
+	alsoToStdout := level == "ERROR" || level == "FATAL" || level == "PANIC"
+	writeToFile(strLogData, l.Writer, alsoToStdout)
 }
 
 func (l *logger) Debug(ctx context.Context, message string, err error) {
