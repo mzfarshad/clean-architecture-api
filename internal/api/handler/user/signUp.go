@@ -25,6 +25,7 @@ func SignUp(c *gin.Context) {
 			apperr.TypeApi,
 			err.Error(),
 		)
+		log.Error(ctx, "", customErr)
 		c.IndentedJSON(customErr.Code, customErr)
 		return
 	}
@@ -55,6 +56,7 @@ func SignUp(c *gin.Context) {
 	token, err := jwt.NewAccessToken(newUser.Email, string(newUser.Type), newUser.ID)
 	if err != nil {
 		if customeErr, ok := err.(*apperr.CustomErr); ok {
+			log.Error(ctx, "", customeErr)
 			c.IndentedJSON(customeErr.Code, customeErr)
 			return
 		}

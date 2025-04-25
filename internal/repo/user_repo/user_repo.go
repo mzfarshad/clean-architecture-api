@@ -8,6 +8,7 @@ import (
 	"github.com/mzfarshad/music_store_api/internal/api/presenter"
 	"github.com/mzfarshad/music_store_api/internal/models"
 	apperr "github.com/mzfarshad/music_store_api/pkg/appErr"
+	"github.com/mzfarshad/music_store_api/pkg/logger"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -28,6 +29,7 @@ func NewAuthUserRepo(db *gorm.DB) AuthUserRepository {
 }
 
 func (a *authUserRepo) FindEmail(ctx context.Context, email string) (models.User, error) {
+	log := logger.GetLogger(ctx)
 	var user models.User
 	result := a.db.WithContext(ctx).Where("email = ?", email).Debug().First(&user)
 	if result.Error != nil {
@@ -38,17 +40,21 @@ func (a *authUserRepo) FindEmail(ctx context.Context, email string) (models.User
 				apperr.TypeDatabase,
 				result.Error.Error(),
 			)
+			log.Error(ctx, customeErr.Message, result.Error)
 			return models.User{}, customeErr
 		}
+		log.Error(ctx, fmt.Sprintf("failed find email %s", email), result.Error)
 		return models.User{}, result.Error
 	}
 	return user, nil
 }
 
 func (a *authUserRepo) SaveUser(ctx context.Context, user presenter.SignUpUser) error {
+	log := logger.GetLogger(ctx)
 	newUser := new(models.User)
 	pass, err := hashPass(user.Password)
 	if err != nil {
+		log.Error(ctx, "", err)
 		return err
 	}
 	newUser.Email = user.Email
@@ -62,6 +68,7 @@ func (a *authUserRepo) SaveUser(ctx context.Context, user presenter.SignUpUser) 
 			apperr.TypeDatabase,
 			result.Error.Error(),
 		)
+		log.Error(ctx, "", customErr)
 		return customErr
 	}
 	return nil
