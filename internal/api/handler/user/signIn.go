@@ -18,6 +18,7 @@ func SignIn(c *gin.Context) {
 
 	ctx := c.Request.Context()
 	log := logger.GetLogger(ctx)
+	log.Info(ctx, "Starting Sign In", nil)
 	var req presenter.SignInUser
 	if err := c.ShouldBindJSON(&req); err != nil {
 		customErr := apperr.NewAppErr(
@@ -70,7 +71,7 @@ func SignIn(c *gin.Context) {
 		}
 
 	}
-
+	log.Info(ctx, "Successfully SignIn", nil)
 	c.IndentedJSON(http.StatusOK, gin.H{"Message": "Successfully signin",
 		"Email": user.Email, "Token": token})
 }

@@ -36,7 +36,8 @@ func NewAccessToken(email, userType string, id uint) (string, error) {
 	return tokenStr, nil
 }
 
-func ValidateToken(ctx context.Context, tkn string) (*TokenUser, bool) {
+func ValidateToken(ctx context.Context, tkn string) (*TokenUser, error) {
+	log := logger.GetLogger(ctx)
 	tokenUser := &TokenUser{}
 	token, err := jwt.Parse(tkn, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -45,7 +46,6 @@ func ValidateToken(ctx context.Context, tkn string) (*TokenUser, bool) {
 		return []byte(conf.Get().JWT().SecretKey), nil
 	})
 	if err != nil {
-		log := logger.GetLogger(ctx)
 		customErr := apperr.NewAppErr(
 			apperr.StatusInternalServerError,
 			"failed validate token",
@@ -53,15 +53,20 @@ func ValidateToken(ctx context.Context, tkn string) (*TokenUser, bool) {
 			err.Error(),
 		)
 		log.Error(ctx, "", customErr)
-		return nil, false
+		return nil, customErr
 	}
 	if claim, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		tokenUser.Email = (claim["email"]).(string)
 		tokenUser.UserType = (claim["user_type"]).(string)
 		userID := (claim["id"]).(float64)
 		tokenUser.ID = uint(userID)
-		return tokenUser, true
+		return tokenUser, nil
 	}
-
-	return nil, false
+	customErr := apperr.NewAppErr(
+		apperr.StatusInternalServerError,
+		"invalidate token",
+		apperr.TypeApi,
+		"",
+	)
+	return nil, customErr
 }

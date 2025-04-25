@@ -29,6 +29,7 @@ func main() {
 
 	router := gin.Default()
 	router.Use(middleware.LoggerMiddleware())
+	router.Use(middleware.Authenticate())
 	auth := router.Group(userSignUp)
 
 	auth.POST("/signup", user.SignUp)
