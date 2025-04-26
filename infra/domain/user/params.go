@@ -5,3 +5,8 @@ type CreateParams struct {
 	Password string
 	Type     Type
 }
+
+type SearchParams struct {
+	Name  string
+	Email string
+}
