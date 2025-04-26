@@ -1,0 +1,16 @@
+package user
+
+import "context"
+
+// AdminUseCase represents what an TypeAdmin can do with user Entity.
+type AdminUseCase interface {
+	ReactivateUser(ctx context.Context, userId uint)
+	DeactivateUser(ctx context.Context, userId uint, reason string) error
+	SearchInUsers(ctx context.Context, params SearchParams /*pagination?*/) ([]*Entity, error)
+	UpdateMyProfile(ctx context.Context, name string) error
+}
+
+// CustomerUseCase represents what a TypeCustomer can do with user Entity.
+type CustomerUseCase interface {
+	UpdateMyName(ctx context.Context, name string) error
+}
