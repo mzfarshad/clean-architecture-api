@@ -7,17 +7,21 @@ import (
 
 type User struct {
 	gorm.Model
-	Name         string
-	Email        string `gorm:"unique"`
-	PasswordHash string
-	Type         user.Type `gorm:"default:user"` // TODO: make an enum in database using a common function
+	Name           string
+	Email          string `gorm:"unique"`
+	PasswordHash   string
+	InactiveReason string
+	Type           user.Type `gorm:"default:user"` // TODO: make an enum in database using a common function
+	Status         bool      `gorm:"default:true"`
 }
 
 func mapUserToEntity(m *User) *user.Entity {
 	return &user.Entity{
-		Entity: gormModelToDomainEntity(m.Model),
-		Name:   m.Name,
-		Email:  m.Email,
-		Type:   m.Type,
+		Entity:         gormModelToDomainEntity(m.Model),
+		Name:           m.Name,
+		Email:          m.Email,
+		Type:           m.Type,
+		InactiveReason: m.InactiveReason,
+		Status:         m.Status,
 	}
 }

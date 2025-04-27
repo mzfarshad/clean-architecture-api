@@ -13,6 +13,8 @@ type User struct {
 	gorm.Model
 	Name     string
 	Email    string `gorm:"unique"`
+	Notice   string
 	Password string
 	Type     UserType `gorm:"default:user"`
+	Status   bool     `gorm:"default:true"`
 }
