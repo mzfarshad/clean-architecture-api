@@ -11,7 +11,7 @@ type User struct {
 	Email          string `gorm:"unique"`
 	PasswordHash   string
 	InactiveReason string
-	Type           user.Type `gorm:"default:user"` // TODO: make an enum in database using a common function
+	Type           user.Type `gorm:"type:user_type;default:'customer'"` // TODO: make an enum in database using a common function
 	Status         bool      `gorm:"default:true"`
 }
 

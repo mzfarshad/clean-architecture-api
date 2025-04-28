@@ -44,12 +44,13 @@ func (r *userRepo) Create(ctx context.Context, params user.CreateParams) (*user.
 		return nil, err
 	}
 	model := User{
+		Name:         params.Name,
 		Email:        params.Email,
 		PasswordHash: string(hash),
 		Type:         params.Type,
 	}
 	err = r.db.WithContext(ctx).
-		Clauses(clause.Returning{}). // TODO: Search in gorm doc if we need this.
+		Clauses(clause.Returning{}). // TODO: Search in gorm doc if we need this.-- Yes, we need it because we can get the fields that the database fills in itself after creation.
 		Create(&model).Error
 	if err != nil {
 		return nil, err
