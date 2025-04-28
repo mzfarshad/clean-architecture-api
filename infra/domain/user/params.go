@@ -1,6 +1,7 @@
 package user
 
 type CreateParams struct {
+	Name     string
 	Email    string
 	Password string
 	Type     Type

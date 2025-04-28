@@ -32,7 +32,24 @@ func (s authService) SignIn(ctx context.Context, email, password string) (*auth.
 	}, nil
 }
 
-func (s authService) Signup(ctx context.Context, email, password string) (*auth.PairToken, error) {
-	//TODO implement me
-	panic("implement me")
+func (s authService) Signup(ctx context.Context, name, email, password string) (*auth.PairToken, error) {
+	var customer user.CreateParams
+	_, err := s.userRepo.FirstByEmail(ctx, email)
+	if err == nil {
+		return nil, err
+	}
+	customer.Email = email
+	customer.Name = name
+	customer.Password = password
+	customer.Type = user.TypeCustomer
+
+	usr, err := s.userRepo.Create(ctx, customer)
+	if err != nil {
+		return nil, err
+	}
+	access, err := auth.NewAccessToken(usr.Email, string(usr.Type), usr.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &auth.PairToken{Access: *access}, nil
 }
