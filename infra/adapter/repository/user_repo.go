@@ -58,7 +58,7 @@ func (r *userRepo) Create(ctx context.Context, params user.CreateParams) (*user.
 	return mapUserToEntity(&model), nil
 }
 
-func (r *userRepo) Find(ctx context.Context, params user.SearchParams) (*user.ResponsePagination, error) {
+func (r *userRepo) Find(ctx context.Context, params user.SearchParams) (*user.PaginationParams, error) {
 	var users []User
 	var totalData int64
 	var totalPages int
@@ -72,12 +72,6 @@ func (r *userRepo) Find(ctx context.Context, params user.SearchParams) (*user.Re
 	if err := query.Count(&totalData).Error; err != nil {
 		return nil, err
 	}
-	if params.Limit < 1 {
-		params.Limit = 10
-	}
-	if params.Page < 1 {
-		params.Page = 1
-	}
 	totalPages = int((totalData + int64(params.Limit) - 1) / int64(params.Limit))
 	ofst := (params.Page - 1) * params.Limit
 	if err := query.Limit(params.Limit).Offset(ofst).Find(&users).Error; err != nil {
@@ -87,7 +81,7 @@ func (r *userRepo) Find(ctx context.Context, params user.SearchParams) (*user.Re
 	for _, entity := range users {
 		entities = append(entities, mapUserToEntity(&entity))
 	}
-	return &user.ResponsePagination{
+	return &user.PaginationParams{
 		TotalData:  int(totalData),
 		TotalPages: totalPages,
 		Result:     entities,

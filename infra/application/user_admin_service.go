@@ -49,12 +49,18 @@ func (s *adminService) ReactivateUser(ctx context.Context, userId uint) error {
 }
 
 func (s *adminService) SearchInUsers(ctx context.Context,
-	params user.SearchParams) (*user.ResponsePagination, error) {
-	resPagination, err := s.userRepo.Find(ctx, params)
+	params user.SearchParams) (*user.PaginationParams, error) {
+	if params.Limit < 1 {
+		params.Limit = 10
+	}
+	if params.Page < 1 {
+		params.Page = 1
+	}
+	usrPagination, err := s.userRepo.Find(ctx, params)
 	if err != nil {
 		return nil, err
 	}
-	return resPagination, nil
+	return usrPagination, nil
 }
 
 func (s *adminService) UpdateMyProfile(ctx context.Context, name, email string) error {

@@ -6,7 +6,7 @@ import "context"
 type AdminUseCase interface {
 	ReactivateUser(ctx context.Context, userId uint) error
 	DeactivateUser(ctx context.Context, userId uint, reason string) error
-	SearchInUsers(ctx context.Context, params SearchParams) (*ResponsePagination, error)
+	SearchInUsers(ctx context.Context, params SearchParams) (*PaginationParams, error)
 	UpdateMyProfile(ctx context.Context, name, email string) error // added email to parmas for searching user
 }
 
