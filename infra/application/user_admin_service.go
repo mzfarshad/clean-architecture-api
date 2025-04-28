@@ -49,8 +49,12 @@ func (s *adminService) ReactivateUser(ctx context.Context, userId uint) error {
 }
 
 func (s *adminService) SearchInUsers(ctx context.Context,
-	params user.SearchParams /*pagination*/) ([]*user.Entity, error) {
-	panic("implement me")
+	params user.SearchParams) (*user.ResponsePagination, error) {
+	resPagination, err := s.userRepo.Find(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+	return resPagination, nil
 }
 
 func (s *adminService) UpdateMyProfile(ctx context.Context, name, email string) error {

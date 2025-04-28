@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/mzfarshad/music_store_api/infra/domain/user"
 	"golang.org/x/crypto/bcrypt"
@@ -56,12 +57,44 @@ func (r *userRepo) Create(ctx context.Context, params user.CreateParams) (*user.
 	return mapUserToEntity(&model), nil
 }
 
-func (r *userRepo) Find(ctx context.Context, params user.SearchParams) ([]*user.Entity, error) {
-	return nil, nil
+func (r *userRepo) Find(ctx context.Context, params user.SearchParams) (*user.ResponsePagination, error) {
+	var users []User
+	var totalData int64
+	var totalPages int
+	query := r.db.WithContext(ctx).Model(&User{})
+	if params.Email != "" {
+		query = query.Where("email ILIKE ?", fmt.Sprintf("%%%s%%", params.Email))
+	}
+	if params.Name != "" {
+		query = query.Where("name ILIKE ?", fmt.Sprintf("%%%s%%", params.Name))
+	}
+	if err := query.Count(&totalData).Error; err != nil {
+		return nil, err
+	}
+	if params.Limit < 1 {
+		params.Limit = 10
+	}
+	if params.Page < 1 {
+		params.Page = 1
+	}
+	totalPages = int((totalData + int64(params.Limit) - 1) / int64(params.Limit))
+	ofst := (params.Page - 1) * params.Limit
+	if err := query.Limit(params.Limit).Offset(ofst).Find(&users).Error; err != nil {
+		return nil, err
+	}
+	var entities []*user.Entity
+	for _, entity := range users {
+		entities = append(entities, mapUserToEntity(&entity))
+	}
+	return &user.ResponsePagination{
+		TotalData:  int(totalData),
+		TotalPages: totalPages,
+		Result:     entities,
+	}, nil
 }
 
 func (r *userRepo) Update(ctx context.Context, entity *user.Entity) error {
-	err := r.db.Model(&User{}).Where("id = ?", entity.Id).Updates(map[string]interface{}{
+	err := r.db.WithContext(ctx).Model(&User{}).Where("id = ?", entity.Id).Updates(map[string]interface{}{
 		"name":            entity.Name,
 		"email":           entity.Email,
 		"inactive_reason": entity.InactiveReason,

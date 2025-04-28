@@ -12,7 +12,7 @@ type Repository interface {
 type Query interface { // GORM: First, Last, Take, Find
 	FirstByEmail(ctx context.Context, email string) (*Entity, error)
 	FirstById(ctx context.Context, id uint) (*Entity, error)
-	Find(ctx context.Context, params SearchParams) ([]*Entity, error)
+	Find(ctx context.Context, params SearchParams) (*ResponsePagination, error)
 }
 
 type Command interface { // GORM: Create, Save, Update, Updates, FirstOrCreate, FirstOrInit, ...

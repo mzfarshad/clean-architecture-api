@@ -25,3 +25,10 @@ func mapUserToEntity(m *User) *user.Entity {
 		Status:         m.Status,
 	}
 }
+
+type UserFilter struct {
+	Name  string `form:"name"`
+	Email string `form:"email"`
+	Page  int    `form:"page"`
+	Limit int    `form:"limit"`
+}
