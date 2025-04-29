@@ -27,6 +27,7 @@ func mapUserToEntity(m *User) *user.Entity {
 }
 
 // must be defined int handler layer
+
 // type UserSearch struct {
 // 	Name  string `form:"name"`
 // 	Email string `form:"email"`
