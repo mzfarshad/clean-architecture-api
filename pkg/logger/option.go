@@ -41,7 +41,7 @@ func applyOption(requestId, level string, option Option) (*logPrint, error) {
 	}
 	logEty.Level = level
 	if requestId != "unknown" {
-		logEty.RequsetID = requestId
+		logEty.RequestID = requestId
 	}
 	if option.ShowFileName {
 		logEty.FileName = filepath.Base(file)
