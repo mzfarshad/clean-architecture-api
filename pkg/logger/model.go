@@ -12,7 +12,7 @@ import (
 type logPrint struct {
 	TimeStamp    string `json:"time_stamp,omitempty"`
 	Level        string `json:"level"`
-	RequsetID    string `json:"request_id,omitempty"`
+	RequestID    string `json:"request_id,omitempty"`
 	FileName     string `json:"file_name,omitempty"`
 	FuncName     string `json:"function_name,omitempty"`
 	Line         string `json:"line,omitempty"`
