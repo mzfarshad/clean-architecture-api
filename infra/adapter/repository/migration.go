@@ -13,8 +13,7 @@ func createEnum(db *gorm.DB, values ...string) error {
 	checkSql := `
 		SELECT EXISTS (
 			SELECT 1 FROM pg_type WHERE typename = ?
-		)
-`
+		)`
 	if err := db.Raw(checkSql, enumName).Scan(&exists).Error; err != nil {
 		return err
 	}
