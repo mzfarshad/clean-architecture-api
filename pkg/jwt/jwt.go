@@ -3,9 +3,9 @@ package jwt
 import (
 	"context"
 	"fmt"
+	"github.com/mzfarshad/music_store_api/conf"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/mzfarshad/music_store_api/internal/conf"
 	apperr "github.com/mzfarshad/music_store_api/pkg/appErr"
 	"github.com/mzfarshad/music_store_api/pkg/logger"
 )

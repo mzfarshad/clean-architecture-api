@@ -12,7 +12,7 @@ func createEnum(db *gorm.DB, values ...string) error {
 	enumName := "user_type"
 	checkSql := `
 		SELECT EXISTS (
-			SELECT 1 FROM pg_type WHERE typename = ?
+			SELECT 1 FROM pg_type WHERE typname = ?
 		)`
 	if err := db.Raw(checkSql, enumName).Scan(&exists).Error; err != nil {
 		return err
@@ -31,6 +31,6 @@ func createEnum(db *gorm.DB, values ...string) error {
 	return db.Exec(creatSql).Error
 }
 
-func CreateUserEnum(db *gorm.DB) error {
+func createUserEnum(db *gorm.DB) error {
 	return createEnum(db, string(user.TypeAdmin), string(user.TypeCustomer))
 }

@@ -2,8 +2,8 @@ package auth
 
 import (
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/mzfarshad/music_store_api/conf"
 	"github.com/mzfarshad/music_store_api/infra/domain/user"
-	"github.com/mzfarshad/music_store_api/internal/conf"
 	apperr "github.com/mzfarshad/music_store_api/pkg/appErr"
 	"time"
 )
