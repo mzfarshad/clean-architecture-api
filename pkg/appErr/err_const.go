@@ -1,5 +1,6 @@
 package apperr
 
+// TODO: improve error package
 // type error
 const (
 	TypeApi        = "API"
