@@ -7,10 +7,12 @@ import (
 
 type Entity struct {
 	domain.Entity
-	Name         string
-	Email        string
-	passwordHash string
-	Type         Type
+	Name           string
+	Email          string
+	passwordHash   string
+	InactiveReason string
+	Type           Type
+	Status         bool
 }
 
 func (e Entity) CompareHashAndPassword(password string) error {
