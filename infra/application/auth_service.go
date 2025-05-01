@@ -23,7 +23,7 @@ func (s authService) SignIn(ctx context.Context, email, password string) (*auth.
 	if err = usr.CompareHashAndPassword(password); err != nil {
 		return nil, err
 	}
-	access, err := auth.NewAccessToken(usr.Email, string(usr.Type), usr.Id)
+	access, err := auth.NewAccessToken(usr.Email, usr.Type, usr.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (s authService) Signup(ctx context.Context, name, email, password string) (
 	if err != nil {
 		return nil, err
 	}
-	access, err := auth.NewAccessToken(usr.Email, string(usr.Type), usr.Id)
+	access, err := auth.NewAccessToken(usr.Email, usr.Type, usr.Id)
 	if err != nil {
 		return nil, err
 	}

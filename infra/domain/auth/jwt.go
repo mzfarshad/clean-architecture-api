@@ -2,6 +2,7 @@ package auth
 
 import (
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/mzfarshad/music_store_api/infra/domain/user"
 	"github.com/mzfarshad/music_store_api/internal/conf"
 	apperr "github.com/mzfarshad/music_store_api/pkg/appErr"
 	"time"
@@ -14,7 +15,7 @@ type UserClaims struct {
 	ID       uint
 }
 
-func NewAccessToken(email string, userType string, id uint) (*Token, error) {
+func NewAccessToken(email string, userType user.Type, id uint) (*Token, error) {
 	jwtAccessTokenTTL := 24 * time.Hour // // TODO: add TTL to jwt config
 	now := time.Now()
 	expiresAt := now.Add(jwtAccessTokenTTL)
@@ -24,7 +25,7 @@ func NewAccessToken(email string, userType string, id uint) (*Token, error) {
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 		},
 		Email:    email,
-		UserType: userType,
+		UserType: string(userType),
 		ID:       id,
 	})
 	secretKey := []byte(conf.Get().JWT().SecretKey)
