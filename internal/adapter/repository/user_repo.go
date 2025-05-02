@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"fmt"
+	"github.com/mzfarshad/music_store_api/pkg/dto"
+	"github.com/mzfarshad/music_store_api/pkg/errs"
 
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	"golang.org/x/crypto/bcrypt"
@@ -24,7 +26,7 @@ func (r *userRepo) FirstByEmail(ctx context.Context, email string) (*user.Entity
 	var model User
 	err := r.db.WithContext(ctx).Where("email = ?", email).First(&model).Error
 	if err != nil {
-		return nil, err
+		return nil, errs.Handle(err, gormErrHandler("user"))
 	}
 	return mapUserToEntity(&model), nil
 }
@@ -33,7 +35,7 @@ func (r *userRepo) FirstById(ctx context.Context, id uint) (*user.Entity, error)
 	var model User
 	err := r.db.WithContext(ctx).Where("id = ?", id).First(&model).Error
 	if err != nil {
-		return nil, err
+		return nil, errs.Handle(err, gormErrHandler("user"))
 	}
 	return mapUserToEntity(&model), nil
 }
@@ -53,13 +55,13 @@ func (r *userRepo) Create(ctx context.Context, params user.CreateParams) (*user.
 		Clauses(clause.Returning{}). // TODO: Search in gorm doc if we need this.-- Yes, we need it because we can get the fields that the database fills in itself after creation.
 		Create(&model).Error
 	if err != nil {
-		return nil, err
+		return nil, errs.Handle(err, gormErrHandler("user"))
 	}
 	return mapUserToEntity(&model), nil
 }
 
 func (r *userRepo) Find(ctx context.Context, params user.SearchParams) (*user.PaginationParams, error) {
-	var users []User
+	var users []*User
 	var totalData int64
 	var totalPages int
 	query := r.db.WithContext(ctx).Model(&User{})
@@ -70,21 +72,17 @@ func (r *userRepo) Find(ctx context.Context, params user.SearchParams) (*user.Pa
 		query = query.Where("name ILIKE ?", fmt.Sprintf("%%%s%%", params.Name))
 	}
 	if err := query.Count(&totalData).Error; err != nil {
-		return nil, err
+		return nil, errs.Handle(err, gormErrHandler("user"))
 	}
 	totalPages = int((totalData + int64(params.Limit) - 1) / int64(params.Limit))
 	ofst := (params.Page - 1) * params.Limit
 	if err := query.Limit(params.Limit).Offset(ofst).Find(&users).Error; err != nil {
 		return nil, err
 	}
-	var entities []*user.Entity
-	for _, entity := range users {
-		entities = append(entities, mapUserToEntity(&entity))
-	}
 	return &user.PaginationParams{
 		TotalData:  int(totalData),
 		TotalPages: totalPages,
-		Result:     entities,
+		Result:     dto.List(users, mapUserToEntity),
 	}, nil
 }
 
