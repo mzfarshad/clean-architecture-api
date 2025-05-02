@@ -1,4 +1,4 @@
-package application
+package customer
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 )
 
-func NewCustomerService(userRepo user.Repository) user.CustomerUseCase {
+func NewUserService(userRepo user.Repository) user.CustomerUseCase {
 	return &customerService{
 		userRepo: userRepo,
 	}

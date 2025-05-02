@@ -1,4 +1,4 @@
-package application
+package admin
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 )
 
-func NewAdminService(userRepo user.Repository) user.AdminUseCase {
+func NewUserService(userRepo user.Repository) user.AdminUseCase {
 	return &adminService{
 		userRepo: userRepo,
 	}

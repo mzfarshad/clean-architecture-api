@@ -7,22 +7,28 @@ import (
 	"github.com/google/wire"
 	"github.com/mzfarshad/music_store_api/internal/adapter/repository"
 	"github.com/mzfarshad/music_store_api/internal/application"
+	"github.com/mzfarshad/music_store_api/internal/application/admin"
+	"github.com/mzfarshad/music_store_api/internal/application/customer"
 )
 
-func InjectDependencies() (*application.Container, error) {
+func NewContainer() (*application.Container, error) {
 	wire.Build(
 		// basic dependencies
 
 		// repositories
 		repository.NewPostgresConnection,
 		repository.NewUserRepo,
-		// application's share services
+		// share services
+
+		// customer services
+		customer.NewAuthService,
+		customer.NewUserService,
+
+		// admin services
+		admin.NewUserService,
 
 		// application container
 		application.NewContainer,
-		application.NewAuthService,
-		application.NewAdminService,
-		application.NewCustomerService,
 	)
 
 	return &application.Container{}, nil

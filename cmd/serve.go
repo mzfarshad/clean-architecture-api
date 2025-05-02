@@ -22,7 +22,7 @@ Examples:
 
 Ensure that the configuration file is set up correctly before starting the server.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		container, err := internal.InjectDependencies()
+		container, err := internal.NewContainer()
 		if err != nil {
 			log.Fatalln(err)
 		}

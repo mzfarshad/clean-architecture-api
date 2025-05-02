@@ -9,19 +9,21 @@ package internal
 import (
 	"github.com/mzfarshad/music_store_api/internal/adapter/repository"
 	"github.com/mzfarshad/music_store_api/internal/application"
+	"github.com/mzfarshad/music_store_api/internal/application/admin"
+	"github.com/mzfarshad/music_store_api/internal/application/customer"
 )
 
 // Injectors from wire.go:
 
-func InjectDependencies() (*application.Container, error) {
+func NewContainer() (*application.Container, error) {
 	db, err := repository.NewPostgresConnection()
 	if err != nil {
 		return nil, err
 	}
 	userRepository := repository.NewUserRepo(db)
-	adminUseCase := application.NewAdminService(userRepository)
-	customerUseCase := application.NewAuthService(userRepository)
-	userCustomerUseCase := application.NewCustomerService(userRepository)
+	adminUseCase := admin.NewUserService(userRepository)
+	customerUseCase := customer.NewAuthService(userRepository)
+	userCustomerUseCase := customer.NewUserService(userRepository)
 	container := application.NewContainer(adminUseCase, customerUseCase, userCustomerUseCase)
 	return container, nil
 }
