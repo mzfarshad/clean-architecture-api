@@ -14,3 +14,7 @@ type AdminUseCase interface {
 type CustomerUseCase interface {
 	UpdateMyName(ctx context.Context, name, email string) error // added email to parmas for searching user
 }
+
+type CliUseCase interface {
+	IncreaseUsersCredit(ctx context.Context, amount uint) error
+}
