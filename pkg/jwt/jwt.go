@@ -3,7 +3,7 @@ package jwt
 import (
 	"context"
 	"fmt"
-	"github.com/mzfarshad/music_store_api/conf"
+	"github.com/mzfarshad/music_store_api/config"
 
 	"github.com/golang-jwt/jwt/v5"
 	apperr "github.com/mzfarshad/music_store_api/pkg/appErr"
@@ -22,7 +22,7 @@ func NewAccessToken(email, userType string, id uint) (string, error) {
 		"user_type": userType,
 		"id":        id,
 	})
-	secretKey := []byte(conf.Get().JWT().SecretKey)
+	secretKey := []byte(config.Get().JWT().SecretKey)
 	tokenStr, err := token.SignedString(secretKey)
 	if err != nil {
 		customErr := apperr.NewAppErr(
@@ -43,7 +43,7 @@ func ValidateToken(ctx context.Context, tkn string) (*TokenUser, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 		}
-		return []byte(conf.Get().JWT().SecretKey), nil
+		return []byte(config.Get().JWT().SecretKey), nil
 	})
 	if err != nil {
 		customErr := apperr.NewAppErr(
