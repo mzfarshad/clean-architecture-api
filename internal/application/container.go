@@ -5,8 +5,8 @@ import (
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 )
 
-type share struct {
-	// For future when we need to use a service in another service preventing import cycle
+type admin struct {
+	UserService user.AdminUseCase
 }
 
 type customer struct {
@@ -14,14 +14,19 @@ type customer struct {
 	UserService user.CustomerUseCase
 }
 
-type admin struct {
-	UserService user.AdminUseCase
+type share struct {
+	// For future when we need to use a service in another service preventing import cycle
+}
+
+type cli struct {
+	// For future when we need to implement a cli tool in different domain bounded contexts
 }
 
 type Container struct {
-	Share    share
 	Admin    admin
 	Customer customer
+	Share    share
+	Cli      cli
 }
 
 func NewContainer(
@@ -38,7 +43,6 @@ func NewContainer(
 
 ) *Container {
 	return &Container{
-		Share: share{},
 		Admin: admin{
 			UserService: adminUserService,
 		},
@@ -46,5 +50,7 @@ func NewContainer(
 			AuthService: authService,
 			UserService: userService,
 		},
+		Share: share{},
+		Cli:   cli{},
 	}
 }
