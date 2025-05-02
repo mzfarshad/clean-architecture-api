@@ -7,18 +7,8 @@ import (
 )
 
 func NewPostgresConnection() (*gorm.DB, error) {
-	psql := config.Get().Postgres()
-	db, err := gorm.Open(postgres.Open(psql.DSN()), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(config.Get().Postgres.DSN), &gorm.Config{})
 	if err != nil {
-		return nil, err
-	}
-	if err := createUserEnum(db); err != nil {
-		return nil, err
-	}
-	if err := db.AutoMigrate(&User{}); err != nil {
-		return nil, err
-	}
-	if err := db.Exec(`ALTER TABLE users ALTER COLUMN type SET DEFAULT 'customer'`).Error; err != nil {
 		return nil, err
 	}
 	return db, nil

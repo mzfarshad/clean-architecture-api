@@ -16,9 +16,9 @@ type UserClaims struct {
 }
 
 func NewAccessToken(email string, userType user.Type, id uint) (*Token, error) {
-	jwtAccessTokenTTL := 24 * time.Hour // // TODO: add TTL to jwt config
+	cfg := config.Get()
 	now := time.Now()
-	expiresAt := now.Add(jwtAccessTokenTTL)
+	expiresAt := now.Add(cfg.Jwt.Access.TTL)
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &UserClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			IssuedAt:  jwt.NewNumericDate(now),
@@ -28,7 +28,7 @@ func NewAccessToken(email string, userType user.Type, id uint) (*Token, error) {
 		UserType: string(userType),
 		ID:       id,
 	})
-	secretKey := []byte(config.Get().JWT().SecretKey)
+	secretKey := []byte(cfg.Jwt.Access.Secret)
 	tokenStr, err := jwtToken.SignedString(secretKey)
 	if err != nil {
 		customErr := apperr.NewAppErr(
@@ -41,6 +41,6 @@ func NewAccessToken(email string, userType user.Type, id uint) (*Token, error) {
 	}
 	return &Token{
 		Raw:       tokenStr,
-		ExpiresAt: time.Now().Add(jwtAccessTokenTTL),
+		ExpiresAt: time.Now().Add(cfg.Jwt.Access.TTL),
 	}, nil
 }

@@ -1,25 +1,35 @@
 package config
 
 import (
-	"os"
-
-	apperr "github.com/mzfarshad/music_store_api/pkg/appErr"
+	"github.com/spf13/viper"
+	"time"
 )
 
-type jwt struct {
-	SecretKey string
+type token struct {
+	Secret string        `validate:"required"`
+	TTL    time.Duration `validate:"gt=0"`
 }
 
-func (j *jwt) fromEnv() (*jwt, error) {
-	j.SecretKey = os.Getenv("SECRET_KEY")
-	if j.SecretKey == "" {
-		customErr := apperr.NewAppErr(
-			apperr.StatusBadRequest,
-			"SECRET_KEY must not be empty!. ",
-			apperr.TypeInternal,
-			"check .env file",
-		)
-		return nil, customErr
-	}
-	return j, nil
+// jwt is a struct that holds the configuration for the JWT manager.
+type jwt struct {
+	Access token
+	//Refresh token
+	// Admin is a struct that holds the configuration for the JWT manager for the back office.
+	//Admin struct {
+	//	Access  token
+	//	Refresh token
+	//}
+}
+
+// viper is a function that reads the configuration from the os env variables.
+func (x *jwt) viper() *jwt {
+	x.Access.Secret = viper.GetString("JWT_ACCESS_SECRET")
+	x.Access.TTL = viper.GetDuration("JWT_ACCESS_TTL")
+	//x.Refresh.Secret = viper.GetString("JWT_REFRESH_SECRET")
+	//x.Refresh.TTL = viper.GetDuration("JWT_REFRESH_TTL")
+	//x.Admin.Access.Secret = viper.GetString("JWT_ADMIN_ACCESS_SECRET")
+	//x.Admin.Access.TTL = viper.GetDuration("JWT_ADMIN_ACCESS_TTL")
+	//x.Admin.Refresh.Secret = viper.GetString("JWT_ADMIN_REFRESH_SECRET")
+	//x.Admin.Refresh.TTL = viper.GetDuration("JWT_ADMIN_REFRESH_TTL")
+	return x
 }

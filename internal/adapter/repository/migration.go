@@ -1,36 +1,31 @@
 package repository
 
 import (
-	"fmt"
-
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	"gorm.io/gorm"
 )
 
-func createEnum(db *gorm.DB, values ...string) error {
-	var exists bool
-	enumName := "user_type"
-	checkSql := `
-		SELECT EXISTS (
-			SELECT 1 FROM pg_type WHERE typname = ?
-		)`
-	if err := db.Raw(checkSql, enumName).Scan(&exists).Error; err != nil {
-		return err
-	}
-	if exists {
-		return nil
-	}
-	valueList := ""
-	for i, v := range values {
-		if i > 0 {
-			valueList += ", "
-		}
-		valueList += fmt.Sprintf("'%s'", v)
-	}
-	creatSql := fmt.Sprintf("CREATE TYPE %s AS ENUM (%s)", enumName, valueList)
-	return db.Exec(creatSql).Error
+var migrationModels = []any{
+	&User{},
 }
 
-func createUserEnum(db *gorm.DB) error {
-	return createEnum(db, string(user.TypeAdmin), string(user.TypeCustomer))
+func Migrate(db *gorm.DB) error {
+	if err := beforeMigrate(db); err != nil {
+		return err
+	}
+	if err := db.AutoMigrate(migrationModels...); err != nil {
+		return err
+	}
+	return afterMigrate(db)
+}
+
+func beforeMigrate(db *gorm.DB) error {
+	if err := createEnum(db, "user_type", string(user.TypeAdmin), string(user.TypeCustomer)); err != nil {
+		return err
+	}
+	return nil
+}
+
+func afterMigrate(db *gorm.DB) error {
+	return nil
 }

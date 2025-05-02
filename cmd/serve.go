@@ -10,8 +10,8 @@ import (
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
 	Use:   "serve",
-	Short: "Start the web server",
-	Long: `Start the web server to serve the application.
+	Short: "Starts the web server",
+	Long: `Starts the web server to serve the application.
 
 This command initializes the application with all necessary dependencies
 and starts the web server using the Fiber framework. The server listens

@@ -2,8 +2,10 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/mzfarshad/music_store_api/config"
 	"github.com/mzfarshad/music_store_api/internal/application"
 	"github.com/mzfarshad/music_store_api/pkg/errs"
 	"github.com/mzfarshad/music_store_api/rest"
@@ -52,7 +54,5 @@ func Serve(container *application.Container) error {
 
 	//logs.Info(context.Background(), fmt.Sprintf("Successfully initialized in %q environment.", config.Get().App.Env))
 
-	// TODO: add app config
-	//return app.Listen(fmt.Sprintf(":%s", config.Get().App.Port))
-	panic("implement me")
+	return app.Listen(fmt.Sprintf(":%s", config.Get().App.Port))
 }
