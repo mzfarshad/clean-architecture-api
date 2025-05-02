@@ -7,7 +7,7 @@ import (
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 )
 
-func NewAuthService(userRepo user.Repository) auth.UseCase {
+func NewAuthService(userRepo user.Repository) auth.CustomerUseCase {
 	return &authService{userRepo: userRepo}
 }
 

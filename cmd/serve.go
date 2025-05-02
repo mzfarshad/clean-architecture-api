@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"github.com/mzfarshad/music_store_api/internal"
+	"github.com/mzfarshad/music_store_api/rest/api"
 	"github.com/spf13/cobra"
 	"log"
 )

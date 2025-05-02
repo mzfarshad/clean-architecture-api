@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-type UseCase interface {
+type CustomerUseCase interface {
 	SignIn(ctx context.Context, email, password string) (*PairToken, error)
 	Signup(ctx context.Context, name, email, password string) (*PairToken, error)
 }
