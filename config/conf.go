@@ -1,9 +1,17 @@
 package config
 
 import (
+	"github.com/joho/godotenv"
 	"log"
 	"sync"
 )
+
+func init() {
+	// TODO: use "github.com/spf13/viper" to handle configurations in different environments
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("failed to load .env file: %v", err)
+	}
+}
 
 type Config interface {
 	Postgres() *postgres

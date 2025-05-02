@@ -1,0 +1,9 @@
+Define your api outputs as presenter models here using json tag
+
+Example:
+
+type User struct {
+    rest.DTO // To be able to pass to rest.Success() as a data
+    Id uint `json:"id"`
+    ...
+}
