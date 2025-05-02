@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/mzfarshad/music_store_api/infra/domain"
+	"github.com/mzfarshad/music_store_api/internal/domain"
 	"golang.org/x/crypto/bcrypt"
 )
 

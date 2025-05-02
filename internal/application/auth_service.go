@@ -3,8 +3,8 @@ package application
 import (
 	"context"
 
-	"github.com/mzfarshad/music_store_api/infra/domain/auth"
-	"github.com/mzfarshad/music_store_api/infra/domain/user"
+	"github.com/mzfarshad/music_store_api/internal/domain/auth"
+	"github.com/mzfarshad/music_store_api/internal/domain/user"
 )
 
 func NewAuthService(userRepo user.Repository) auth.UseCase {

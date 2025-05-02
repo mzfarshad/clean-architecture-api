@@ -3,7 +3,7 @@ package application
 import (
 	"context"
 
-	"github.com/mzfarshad/music_store_api/infra/domain/user"
+	"github.com/mzfarshad/music_store_api/internal/domain/user"
 )
 
 func NewCustomerService(userRepo user.Repository) user.CustomerUseCase {
