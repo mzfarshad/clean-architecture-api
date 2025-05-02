@@ -1,13 +1,13 @@
 package repository
 
 import (
-	"github.com/mzfarshad/music_store_api/conf"
+	"github.com/mzfarshad/music_store_api/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func NewPostgresConnection() (*gorm.DB, error) {
-	psql := conf.Get().Postgres()
+	psql := config.Get().Postgres()
 	db, err := gorm.Open(postgres.Open(psql.DSN()), &gorm.Config{})
 	if err != nil {
 		return nil, err

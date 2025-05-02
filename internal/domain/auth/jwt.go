@@ -2,7 +2,7 @@ package auth
 
 import (
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/mzfarshad/music_store_api/conf"
+	"github.com/mzfarshad/music_store_api/config"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	apperr "github.com/mzfarshad/music_store_api/pkg/appErr"
 	"time"
@@ -28,7 +28,7 @@ func NewAccessToken(email string, userType user.Type, id uint) (*Token, error) {
 		UserType: string(userType),
 		ID:       id,
 	})
-	secretKey := []byte(conf.Get().JWT().SecretKey)
+	secretKey := []byte(config.Get().JWT().SecretKey)
 	tokenStr, err := jwtToken.SignedString(secretKey)
 	if err != nil {
 		customErr := apperr.NewAppErr(
