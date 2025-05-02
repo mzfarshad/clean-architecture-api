@@ -3,6 +3,7 @@ package rest
 import (
 	"errors"
 	"github.com/go-playground/validator/v10"
+	"github.com/mzfarshad/music_store_api/config"
 	"github.com/mzfarshad/music_store_api/pkg/errs"
 	"net/http"
 )
@@ -28,13 +29,12 @@ func (e *responseErr) from(err errs.Error) *responseErr {
 	} else {
 		e.Messages = append(e.Messages, err.Error())
 	}
-	// TODO: add app config
-	//if config.Get().App.Debug {
-	//	trace := err.Trace()
-	//	for i := range trace {
-	//		e.Debug = append(e.Debug, trace[i].Error())
-	//	}
-	//}
+	if config.Get().App.Debug {
+		trace := err.Trace()
+		for i := range trace {
+			e.Debug = append(e.Debug, trace[i].Error())
+		}
+	}
 	return e
 }
 
