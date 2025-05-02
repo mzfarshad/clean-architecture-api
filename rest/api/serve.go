@@ -12,6 +12,7 @@ import (
 	"github.com/mzfarshad/music_store_api/pkg/errs"
 	"github.com/mzfarshad/music_store_api/rest"
 	v1 "github.com/mzfarshad/music_store_api/rest/api/v1"
+	"github.com/mzfarshad/music_store_api/rest/api/v1/dashboard"
 	"github.com/mzfarshad/music_store_api/rest/middleware"
 )
 
@@ -52,7 +53,7 @@ func Serve(container *application.Container) error {
 	apiV1 := app.Group("/api/v1")
 	// Register Customers APIs
 	v1.Route(apiV1, container)
-
+	dashboard.Route(apiV1, container)
 	//logs.Info(context.Background(), fmt.Sprintf("Successfully initialized in %q environment.", config.Get().App.Env))
 
 	return app.Listen(fmt.Sprintf(":%s", config.Get().App.Port))
