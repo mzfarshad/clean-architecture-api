@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	"github.com/mzfarshad/music_store_api/rest"
@@ -30,7 +31,7 @@ func deactivateUser(userService user.AdminUseCase) fiber.Handler {
 		if err := userService.DeactivateUser(ctx.Context(), input.Id, input.Reason); err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		return nil
+		return ctx.Status(200).SendString(fmt.Sprintf("user deactived with id %d", input.Id))
 	}
 }
 
@@ -48,7 +49,7 @@ func reactivateUser(userService user.AdminUseCase) fiber.Handler {
 		if err := userService.ReactivateUser(ctx.Context(), input.Id); err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		return nil
+		return ctx.Status(200).SendString(fmt.Sprintf("user reactived with id %d", input.Id))
 	}
 }
 
@@ -67,16 +68,16 @@ func updateMyProfile(userService user.AdminUseCase) fiber.Handler {
 		if err := userService.UpdateMyProfile(ctx.Context(), input.Name, input.Email); err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		return nil
+		return ctx.Status(200).SendString("Successfully updated user")
 	}
 }
 
 type searchUsers struct {
 	rest.DTO `json:"_"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Limit    int    `json:"limit"`
-	Page     int    `json:"page"`
+	Name     string `json:"name" form:"name"`
+	Email    string `json:"email" form:"email"`
+	Limit    int    `json:"limit" form:"limit"`
+	Page     int    `json:"page" form:"page"`
 }
 
 type pagination struct {
