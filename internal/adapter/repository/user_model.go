@@ -20,17 +20,9 @@ func mapUserToEntity(m *User) *user.Entity {
 		Entity:         gormModelToDomainEntity(m.Model),
 		Name:           m.Name,
 		Email:          m.Email,
+		PasswordHash:   m.PasswordHash,
 		Type:           m.Type,
 		InactiveReason: m.InactiveReason,
 		Status:         m.Status,
 	}
 }
-
-// must be defined int handler layer
-
-// type UserSearch struct {
-// 	Name  string `form:"name"`
-// 	Email string `form:"email"`
-// 	Page  int    `form:"page"`
-// 	Limit int    `form:"limit"`
-// }

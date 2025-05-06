@@ -9,12 +9,12 @@ type Entity struct {
 	domain.Entity
 	Name           string
 	Email          string
-	passwordHash   string
+	PasswordHash   string
 	InactiveReason string
 	Type           Type
 	Status         bool
 }
 
 func (e Entity) CompareHashAndPassword(password string) error {
-	return bcrypt.CompareHashAndPassword([]byte(e.passwordHash), []byte(password))
+	return bcrypt.CompareHashAndPassword([]byte(e.PasswordHash), []byte(password))
 }
