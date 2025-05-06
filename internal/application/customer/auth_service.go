@@ -2,7 +2,7 @@ package customer
 
 import (
 	"context"
-
+	"errors"
 	"github.com/mzfarshad/music_store_api/internal/domain/auth"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 )
@@ -36,7 +36,7 @@ func (s authService) Signup(ctx context.Context, name, email, password string) (
 	var customer user.CreateParams
 	_, err := s.userRepo.FirstByEmail(ctx, email)
 	if err == nil {
-		return nil, err
+		return nil, errors.New("customer is exists, please sign in")
 	}
 	customer.Email = email
 	customer.Name = name
