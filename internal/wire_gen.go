@@ -23,9 +23,10 @@ func NewContainer() (*application.Container, error) {
 	}
 	userRepository := repository.NewUserRepo(db)
 	adminUseCase := admin.NewUserService(userRepository)
+	authAdminUseCase := admin.NewAuthService(userRepository)
 	customerUseCase := customer.NewAuthService(userRepository)
 	userCustomerUseCase := customer.NewUserService(userRepository)
 	cliService := admin2.NewCliService(userRepository)
-	container := application.NewContainer(adminUseCase, customerUseCase, userCustomerUseCase, cliService)
+	container := application.NewContainer(adminUseCase, authAdminUseCase, customerUseCase, userCustomerUseCase, cliService)
 	return container, nil
 }

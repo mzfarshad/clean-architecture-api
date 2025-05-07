@@ -8,6 +8,7 @@ import (
 
 type admin struct {
 	UserService user.AdminUseCase
+	AuthService auth.AdminUseCase
 }
 
 type customer struct {
@@ -36,6 +37,7 @@ func NewContainer(
 
 	// Admin Services
 	adminUserService user.AdminUseCase,
+	adminAuthService auth.AdminUseCase,
 
 	// Customer Services
 	authService auth.CustomerUseCase,
@@ -48,6 +50,7 @@ func NewContainer(
 	return &Container{
 		Admin: admin{
 			UserService: adminUserService,
+			AuthService: adminAuthService,
 		},
 		Customer: customer{
 			AuthService: authService,
