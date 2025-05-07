@@ -71,6 +71,7 @@ func (r *userRepo) Find(ctx context.Context, params user.SearchParams) (*user.Pa
 	if params.Name != "" {
 		query = query.Where("name ILIKE ?", fmt.Sprintf("%%%s%%", params.Name))
 	}
+	query = query.Where("user_type = ?", user.TypeCustomer)
 	if err := query.Count(&totalData).Error; err != nil {
 		return nil, errs.Handle(err, gormErrHandler("user"))
 	}

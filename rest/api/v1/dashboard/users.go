@@ -1,10 +1,10 @@
 package dashboard
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	"github.com/mzfarshad/music_store_api/rest"
+	"github.com/mzfarshad/music_store_api/rest/presenter"
 )
 
 func usersRouter(v1Dashboard fiber.Router, userService user.AdminUseCase) {
@@ -16,7 +16,7 @@ func usersRouter(v1Dashboard fiber.Router, userService user.AdminUseCase) {
 	users.Put("/reactivate/:id", reactivateUser(userService))
 }
 
-type deactiveUser struct {
+type deactivatedUser struct {
 	rest.DTO `json:"-"`
 	Id       uint   `params:"id" validate:"required"` // TODO: Test this
 	Reason   string `json:"reason" validate:"required"`
@@ -24,32 +24,32 @@ type deactiveUser struct {
 
 func deactivateUser(userService user.AdminUseCase) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		input, err := rest.Request[deactiveUser]{}.ParseParams(ctx)
+		input, err := rest.Request[deactivatedUser]{}.ParseParams(ctx)
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
 		if err := userService.DeactivateUser(ctx.Context(), input.Id, input.Reason); err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		return ctx.Status(200).SendString(fmt.Sprintf("user deactived with id %d", input.Id))
+		return rest.NewSuccess(presenter.NewDashboardResponse(input.Id, "User deactivated successfully")).Handle(ctx)
 	}
 }
 
-type reactiveUser struct {
+type reactivatedUser struct {
 	rest.DTO `json:"_"`
 	Id       uint `params:"id" validate:"required"`
 }
 
 func reactivateUser(userService user.AdminUseCase) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		input, err := rest.Request[reactiveUser]{}.ParseParams(ctx)
+		input, err := rest.Request[reactivatedUser]{}.ParseParams(ctx)
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
 		if err := userService.ReactivateUser(ctx.Context(), input.Id); err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		return ctx.Status(200).SendString(fmt.Sprintf("user reactived with id %d", input.Id))
+		return rest.NewSuccess(presenter.NewDashboardResponse(input.Id, "User reactivated successfully")).Handle(ctx)
 	}
 }
 
@@ -68,7 +68,7 @@ func updateMyProfile(userService user.AdminUseCase) fiber.Handler {
 		if err := userService.UpdateMyProfile(ctx.Context(), input.Name, input.Email); err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		return ctx.Status(200).SendString("Successfully updated user")
+		return rest.NewSuccess(presenter.NewDashboardResponse(0, "User updated successfully")).Handle(ctx)
 	}
 }
 
@@ -78,11 +78,6 @@ type searchUsers struct {
 	Email    string `json:"email" form:"email"`
 	Limit    int    `json:"limit" form:"limit"`
 	Page     int    `json:"page" form:"page"`
-}
-
-type pagination struct {
-	rest.DTO       `json:"_"`
-	userPagination user.PaginationParams
 }
 
 func searchInUsers(userService user.AdminUseCase) fiber.Handler {
@@ -97,14 +92,12 @@ func searchInUsers(userService user.AdminUseCase) fiber.Handler {
 		searchParam.Email = input.Email
 		searchParam.Page = input.Page
 
-		users, err := userService.SearchInUsers(ctx.Context(), searchParam)
+		pagesData, err := userService.SearchInUsers(ctx.Context(), searchParam)
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		var usersPage pagination
-		usersPage.userPagination.TotalPages = users.TotalPages
-		usersPage.userPagination.TotalData = users.TotalData
-		usersPage.userPagination.Result = users.Result
-		return rest.NewSuccess(usersPage).Handle(ctx)
+		dtoPagesData := rest.NewList(pagesData.Result, presenter.MapUserEntityToUserDTO)
+		pagination := presenter.NewUserPaginationAdapter(searchParam, pagesData)
+		return rest.NewSuccess(dtoPagesData).Paginate(pagination).Handle(ctx)
 	}
 }
