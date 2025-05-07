@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 	"github.com/mzfarshad/music_store_api/internal/domain"
 	"github.com/mzfarshad/music_store_api/pkg/errs"
 	"gorm.io/gorm"
@@ -30,31 +31,26 @@ func gormModelToDomainEntity(m gorm.Model) domain.Entity {
 	}
 }
 
-func createEnum(db *gorm.DB, name string, values ...string) error {
-	//func createEnum(db *gorm.DB, values ...string) error {
-	//	var exists bool
-	//	enumName := "user_type"
-	//	checkSql := `
-	//	SELECT EXISTS (
-	//		SELECT 1 FROM pg_type WHERE typname = ?
-	//	)`
-	//	if err := db.Raw(checkSql, enumName).Scan(&exists).Error; err != nil {
-	//	return err
-	//}
-	//	if exists {
-	//	return nil
-	//}
-	//	valueList := ""
-	//	for i, v := range values {
-	//	if i > 0 {
-	//	valueList += ", "
-	//}
-	//	valueList += fmt.Sprintf("'%s'", v)
-	//}
-	//	creatSql := fmt.Sprintf("CREATE TYPE %s AS ENUM (%s)", enumName, valueList)
-	//	return db.Exec(creatSql).Error
-	//}
+func createEnum(db *gorm.DB, enumName string, values ...string) error {
+	var exists bool
+	checkSQL := `
+		SELECT EXISTS (
+			SELECT 1 FROM pg_type WHERE typname = ?
+		)`
+	if err := db.Raw(checkSQL, enumName).Scan(&exists).Error; err != nil {
+		return err
+	}
+	if exists {
+		return nil
+	}
 
-	//TODO: implement me
-	return errors.New("implement me")
+	valueList := ""
+	for i, v := range values {
+		if i > 0 {
+			valueList += ", "
+		}
+		valueList += fmt.Sprintf("'%s'", v)
+	}
+	createSQL := fmt.Sprintf("CREATE TYPE %s AS ENUM (%s)", enumName, valueList)
+	return db.Exec(createSQL).Error
 }
