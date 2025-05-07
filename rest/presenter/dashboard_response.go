@@ -17,7 +17,6 @@ type DashboardResponse struct {
 	Message  string `json:"message,omitempty"`
 	UserId   uint   `json:"user_id,omitempty"`
 }
-
 type UserDto struct {
 	rest.DTO
 	Id             uint   `json:"id"`
@@ -76,5 +75,5 @@ func (p UserPaginationAdapter) Filters() any {
 	if len(p.Filters_) == 0 {
 		return nil
 	}
-	return p.Filters
+	return p.Filters_
 }

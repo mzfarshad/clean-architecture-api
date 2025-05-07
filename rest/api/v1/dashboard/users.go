@@ -74,10 +74,10 @@ func updateMyProfile(userService user.AdminUseCase) fiber.Handler {
 
 type searchUsers struct {
 	rest.DTO `json:"_"`
-	Name     string `json:"name" form:"name"`
-	Email    string `json:"email" form:"email"`
-	Limit    int    `json:"limit" form:"limit"`
-	Page     int    `json:"page" form:"page"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Limit    int    `json:"limit"`
+	Page     int    `json:"page"`
 }
 
 func searchInUsers(userService user.AdminUseCase) fiber.Handler {
@@ -86,18 +86,21 @@ func searchInUsers(userService user.AdminUseCase) fiber.Handler {
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		var searchParam user.SearchParams
-		searchParam.Limit = input.Limit
-		searchParam.Name = input.Name
-		searchParam.Email = input.Email
-		searchParam.Page = input.Page
+		searchParam := user.SearchParams{
+			Name:  input.Name,
+			Email: input.Email,
+			Limit: input.Limit,
+			Page:  input.Page,
+		}
 
 		pagesData, err := userService.SearchInUsers(ctx.Context(), searchParam)
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
+
 		dtoPagesData := rest.NewList(pagesData.Result, presenter.MapUserEntityToUserDTO)
 		pagination := presenter.NewUserPaginationAdapter(searchParam, pagesData)
+
 		return rest.NewSuccess(dtoPagesData).Paginate(pagination).Handle(ctx)
 	}
 }
