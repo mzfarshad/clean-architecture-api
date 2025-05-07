@@ -24,7 +24,7 @@ type deactiveUser struct {
 
 func deactivateUser(userService user.AdminUseCase) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		input, err := rest.Request[deactiveUser]{}.Parse(ctx)
+		input, err := rest.Request[deactiveUser]{}.ParseParams(ctx)
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
@@ -42,7 +42,7 @@ type reactiveUser struct {
 
 func reactivateUser(userService user.AdminUseCase) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		input, err := rest.Request[reactiveUser]{}.Parse(ctx)
+		input, err := rest.Request[reactiveUser]{}.ParseParams(ctx)
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
