@@ -1,6 +1,7 @@
 package application
 
 import (
+	admin2 "github.com/mzfarshad/music_store_api/internal/application/cli/admin"
 	"github.com/mzfarshad/music_store_api/internal/domain/auth"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 )
@@ -19,6 +20,7 @@ type share struct {
 }
 
 type cli struct {
+	AdminCli admin2.CliService
 	// For future when we need to implement a cli tool in different domain bounded contexts
 }
 
@@ -39,7 +41,8 @@ func NewContainer(
 	authService auth.CustomerUseCase,
 	userService user.CustomerUseCase,
 
-	// Other Use Cases
+	// Cli service
+	adminCliService admin2.CliService,
 
 ) *Container {
 	return &Container{
@@ -51,6 +54,8 @@ func NewContainer(
 			UserService: userService,
 		},
 		Share: share{},
-		Cli:   cli{},
+		Cli: cli{
+			AdminCli: adminCliService,
+		},
 	}
 }

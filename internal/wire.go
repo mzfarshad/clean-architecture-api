@@ -8,6 +8,7 @@ import (
 	"github.com/mzfarshad/music_store_api/internal/adapter/repository"
 	"github.com/mzfarshad/music_store_api/internal/application"
 	"github.com/mzfarshad/music_store_api/internal/application/admin"
+	admin2 "github.com/mzfarshad/music_store_api/internal/application/cli/admin"
 	"github.com/mzfarshad/music_store_api/internal/application/customer"
 )
 
@@ -26,6 +27,9 @@ func NewContainer() (*application.Container, error) {
 
 		// admin services
 		admin.NewUserService,
+
+		// cli service
+		admin2.NewCliService,
 
 		// application container
 		application.NewContainer,
