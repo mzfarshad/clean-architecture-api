@@ -74,15 +74,15 @@ func updateMyProfile(userService user.AdminUseCase) fiber.Handler {
 
 type searchUsers struct {
 	rest.DTO `json:"_"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Limit    int    `json:"limit"`
-	Page     int    `json:"page"`
+	Name     string `form:"name"`
+	Email    string `form:"email"`
+	Limit    int    `form:"limit"`
+	Page     int    `form:"page"`
 }
 
 func searchInUsers(userService user.AdminUseCase) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		input, err := rest.Request[searchUsers]{}.Parse(ctx)
+		input, err := rest.Request[searchUsers]{}.ParseQueries(ctx)
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
