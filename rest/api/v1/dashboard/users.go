@@ -16,22 +16,29 @@ func usersRouter(v1Dashboard fiber.Router, userService user.AdminUseCase) {
 	users.Put("/reactivate/:id", reactivateUser(userService))
 }
 
-type deactivatedUser struct {
+type deactivatedUserId struct {
 	rest.DTO `json:"-"`
-	Id       uint   `params:"id" validate:"required"` // TODO: Test this
+	Id       uint `params:"id" validate:"required"` // TODO: Test this
+}
+type deactivatedUserReason struct {
+	rest.DTO `json:"_"`
 	Reason   string `json:"reason" validate:"required"`
 }
 
 func deactivateUser(userService user.AdminUseCase) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		input, err := rest.Request[deactivatedUser]{}.ParseParams(ctx)
+		userId, err := rest.Request[deactivatedUserId]{}.ParseParams(ctx)
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		if err := userService.DeactivateUser(ctx.Context(), input.Id, input.Reason); err != nil {
+		reason, err := rest.Request[deactivatedUserReason]{}.Parse(ctx)
+		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		return rest.NewSuccess(presenter.NewDashboardResponse(input.Id, "User deactivated successfully")).Handle(ctx)
+		if err := userService.DeactivateUser(ctx.Context(), userId.Id, reason.Reason); err != nil {
+			return rest.NewFailed(err).Handle(ctx)
+		}
+		return rest.NewSuccess(presenter.NewDashboardResponse(userId.Id, "User deactivated successfully")).Handle(ctx)
 	}
 }
 
