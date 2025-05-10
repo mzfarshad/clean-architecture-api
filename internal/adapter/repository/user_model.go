@@ -16,13 +16,13 @@ type User struct {
 }
 
 func mapUserToEntity(m *User) *user.Entity {
-	return &user.Entity{
-		Entity:         gormModelToDomainEntity(m.Model),
+	entity := &user.Entity{
 		Name:           m.Name,
 		Email:          m.Email,
-		PasswordHash:   m.PasswordHash,
-		Type:           m.Type,
 		InactiveReason: m.InactiveReason,
+		Type:           m.Type,
 		Status:         m.Status,
 	}
+	entity.SetPasswordHash(m.PasswordHash)
+	return entity
 }
