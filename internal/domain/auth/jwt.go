@@ -2,13 +2,20 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/mzfarshad/music_store_api/config"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	apperr "github.com/mzfarshad/music_store_api/pkg/appErr"
-	"github.com/mzfarshad/music_store_api/pkg/logger"
 	"time"
+)
+
+var (
+	ErrTokenInvalid            = errors.New("token is invalid")
+	ErrTokenExpired            = errors.New("token is expired")
+	ErrTokenMalformed          = errors.New("token is malformed")
+	ErrUnexpectedSigningMethod = errors.New("unexpected signing method")
 )
 
 type UserClaims struct {
@@ -49,36 +56,25 @@ func NewAccessToken(email string, userType user.Type, id uint) (*Token, error) {
 }
 
 func ValidateToken(ctx context.Context, tkn string) (*UserClaims, error) {
-	log := logger.GetLogger(ctx)
-	tokenUser := &UserClaims{}
-	token, err := jwt.Parse(tkn, func(t *jwt.Token) (any, error) {
+	tokenClaims := &UserClaims{}
+	token, err := jwt.ParseWithClaims(tkn, tokenClaims, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+			return nil, ErrUnexpectedSigningMethod
 		}
 		return []byte(config.Get().Jwt.Access.Secret), nil
 	})
 	if err != nil {
-		customErr := apperr.NewAppErr(
-			apperr.StatusInternalServerError,
-			"failed validate token",
-			apperr.TypeApi,
-			err.Error(),
-		)
-		log.Error(ctx, "", customErr)
-		return nil, customErr
+		switch {
+		case errors.Is(err, jwt.ErrTokenExpired):
+			return nil, ErrTokenExpired
+		case errors.Is(err, jwt.ErrTokenMalformed):
+			return nil, ErrTokenMalformed
+		default:
+			return nil, fmt.Errorf("token parse error: %w", err)
+		}
 	}
-	if claim, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		tokenUser.Email = (claim["email"]).(string)
-		tokenUser.UserType = (claim["user_type"]).(user.Type)
-		userID := (claim["id"]).(float64)
-		tokenUser.ID = uint(userID)
-		return tokenUser, nil
+	if !token.Valid {
+		return nil, ErrTokenInvalid
 	}
-	customErr := apperr.NewAppErr(
-		apperr.StatusInternalServerError,
-		"invalidate token",
-		apperr.TypeApi,
-		"",
-	)
-	return nil, customErr
+	return tokenClaims, nil
 }

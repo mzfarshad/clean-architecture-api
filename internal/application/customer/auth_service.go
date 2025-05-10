@@ -2,9 +2,10 @@ package customer
 
 import (
 	"context"
-
+	"errors"
 	"github.com/mzfarshad/music_store_api/internal/domain/auth"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
+	"github.com/mzfarshad/music_store_api/pkg/errs"
 )
 
 func NewAuthService(userRepo user.Repository) auth.CustomerUseCase {
@@ -18,6 +19,9 @@ type authService struct {
 func (s authService) SignIn(ctx context.Context, email, password string) (*auth.PairToken, error) {
 	usr, err := s.userRepo.FirstByEmail(ctx, email)
 	if err != nil {
+		return nil, err
+	}
+	if usr == nil {
 		return nil, err
 	}
 	if err = usr.CompareHashAndPassword(password); err != nil {
@@ -34,9 +38,12 @@ func (s authService) SignIn(ctx context.Context, email, password string) (*auth.
 
 func (s authService) Signup(ctx context.Context, name, email, password string) (*auth.PairToken, error) {
 	var customer user.CreateParams
-	_, err := s.userRepo.FirstByEmail(ctx, email)
-	if err == nil {
+	usrByEmail, err := s.userRepo.FirstByEmail(ctx, email)
+	if err != nil && !errors.Is(err, errs.NotFound.Err()) {
 		return nil, err
+	}
+	if usrByEmail != nil { // user exists
+		return nil, errs.New(errs.Duplication, "email already taken")
 	}
 	customer.Email = email
 	customer.Name = name
@@ -45,7 +52,7 @@ func (s authService) Signup(ctx context.Context, name, email, password string) (
 
 	usr, err := s.userRepo.Create(ctx, customer)
 	if err != nil {
-		return nil, err
+		return nil, errs.New(errs.Internal, "some thing wrong")
 	}
 	access, err := auth.NewAccessToken(usr.Email, usr.Type, usr.Id)
 	if err != nil {

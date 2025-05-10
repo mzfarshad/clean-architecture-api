@@ -15,6 +15,10 @@ type Entity struct {
 	Status         bool
 }
 
-func (e Entity) CompareHashAndPassword(password string) error {
+func (e *Entity) CompareHashAndPassword(password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(e.passwordHash), []byte(password))
+}
+
+func (e *Entity) SetPasswordHash(hash string) {
+	e.passwordHash = hash
 }

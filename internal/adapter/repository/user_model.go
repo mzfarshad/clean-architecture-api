@@ -16,21 +16,13 @@ type User struct {
 }
 
 func mapUserToEntity(m *User) *user.Entity {
-	return &user.Entity{
-		Entity:         gormModelToDomainEntity(m.Model),
+	entity := &user.Entity{
 		Name:           m.Name,
 		Email:          m.Email,
-		Type:           m.Type,
 		InactiveReason: m.InactiveReason,
+		Type:           m.Type,
 		Status:         m.Status,
 	}
+	entity.SetPasswordHash(m.PasswordHash)
+	return entity
 }
-
-// must be defined int handler layer
-
-// type UserSearch struct {
-// 	Name  string `form:"name"`
-// 	Email string `form:"email"`
-// 	Page  int    `form:"page"`
-// 	Limit int    `form:"limit"`
-// }
