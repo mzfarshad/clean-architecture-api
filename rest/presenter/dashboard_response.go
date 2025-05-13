@@ -5,20 +5,20 @@ import (
 	"github.com/mzfarshad/music_store_api/rest"
 )
 
-func NewDashboardResponse(id uint, msg string) *DashboardResponse {
-	return &DashboardResponse{
+func NewSuccessResponse(id uint, msg string) *SuccessResponse {
+	return &SuccessResponse{
 		Message: msg,
 		UserId:  id,
 	}
 }
 
-type DashboardResponse struct {
+type SuccessResponse struct {
 	rest.DTO `json:"_"`
 	Message  string `json:"message,omitempty"`
 	UserId   uint   `json:"user_id,omitempty"`
 }
 
-type SearchUserDto struct {
+type User struct {
 	rest.DTO
 	Id             uint   `json:"id"`
 	Name           string `json:"name"`
@@ -27,8 +27,8 @@ type SearchUserDto struct {
 	Status         bool   `json:"status"`
 }
 
-func MapUserEntityToSearchUserDTO(entity *user.Entity) *SearchUserDto {
-	return &SearchUserDto{
+func NewUser(entity *user.Entity) *User {
+	return &User{
 		Id:             entity.Id,
 		Name:           entity.Name,
 		Email:          entity.Email,
