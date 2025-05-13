@@ -1,15 +1,15 @@
-package admin
+package admin_cmd
 
 import (
 	"context"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 )
 
-type CliService interface {
+type Service interface {
 	CreateAdmin(email, name, pass string) error
 }
 
-func NewCliService(userRepo user.Repository) CliService {
+func NewAdminCmdService(userRepo user.Repository) Service {
 	return &adminService{
 		repo: userRepo,
 	}

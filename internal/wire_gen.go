@@ -10,7 +10,7 @@ import (
 	"github.com/mzfarshad/music_store_api/internal/adapter/repository"
 	"github.com/mzfarshad/music_store_api/internal/application"
 	"github.com/mzfarshad/music_store_api/internal/application/admin"
-	admin2 "github.com/mzfarshad/music_store_api/internal/application/cli/admin"
+	"github.com/mzfarshad/music_store_api/internal/application/cli/admin_cmd"
 	"github.com/mzfarshad/music_store_api/internal/application/customer"
 )
 
@@ -26,7 +26,7 @@ func NewContainer() (*application.Container, error) {
 	authAdminUseCase := admin.NewAuthService(userRepository)
 	customerUseCase := customer.NewAuthService(userRepository)
 	userCustomerUseCase := customer.NewUserService(userRepository)
-	cliService := admin2.NewCliService(userRepository)
-	container := application.NewContainer(adminUseCase, authAdminUseCase, customerUseCase, userCustomerUseCase, cliService)
+	service := admin_cmd.NewAdminCmdService(userRepository)
+	container := application.NewContainer(adminUseCase, authAdminUseCase, customerUseCase, userCustomerUseCase, service)
 	return container, nil
 }
