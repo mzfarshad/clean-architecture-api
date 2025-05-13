@@ -3,10 +3,9 @@ package repository
 import (
 	"context"
 	"fmt"
+	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	"github.com/mzfarshad/music_store_api/pkg/dto"
 	"github.com/mzfarshad/music_store_api/pkg/errs"
-
-	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"

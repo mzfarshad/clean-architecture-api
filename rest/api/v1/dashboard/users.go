@@ -7,6 +7,11 @@ import (
 	"github.com/mzfarshad/music_store_api/rest/presenter"
 )
 
+const (
+	DefaultPageSize = 20
+	DefaultPage     = 1
+)
+
 func usersRouter(v1Dashboard fiber.Router, userService user.AdminUseCase) {
 	// TODO
 	users := v1Dashboard.Group("/users")
@@ -79,34 +84,27 @@ func updateMyProfile(userService user.AdminUseCase) fiber.Handler {
 	}
 }
 
-type searchUsers struct {
-	rest.DTO `json:"_"`
-	Name     string `form:"name"`
-	Email    string `form:"email"`
-	Limit    int    `form:"limit"`
-	Page     int    `form:"page"`
-}
-
 func searchInUsers(userService user.AdminUseCase) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		input, err := rest.Request[searchUsers]{}.ParseQueries(ctx)
-		if err != nil {
-			return rest.NewFailed(err).Handle(ctx)
-		}
-		searchParam := user.SearchParams{
-			Name:  input.Name,
-			Email: input.Email,
-			Limit: input.Limit,
-			Page:  input.Page,
-		}
-
-		pagesData, err := userService.SearchInUsers(ctx.Context(), searchParam)
+		pagination, err := rest.NewPagination[user.SearchParams](ctx)
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
 
-		dtoPagesData := rest.NewList(pagesData.Result, presenter.MapUserEntityToUserDTO)
-		pagination := presenter.NewUserPaginationAdapter(searchParam, pagesData)
+		if pagination.Size() < 1 {
+			pagination.Query.Limit = DefaultPageSize
+		}
+		if pagination.Page() < 1 {
+			pagination.Query.Page = DefaultPage
+		}
+
+		pagesData, err := userService.SearchInUsers(ctx.Context(), pagination.Query)
+		if err != nil {
+			return rest.NewFailed(err).Handle(ctx)
+		}
+
+		dtoPagesData := rest.NewList(pagesData.Result, presenter.MapUserEntityToSearchUserDTO)
+		pagination.WithTotal(int64(pagesData.TotalData))
 
 		return rest.NewSuccess(dtoPagesData).Paginate(pagination).Handle(ctx)
 	}
