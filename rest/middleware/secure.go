@@ -44,4 +44,5 @@ func ExcludeAccessSecuredRoutes(ctx *fiber.Ctx) bool {
 
 var skippedAccessSecuredRoutes = []uri{
 	"/api/v1/auth/signup",
+	"/api/v1/admin/login",
 }

@@ -8,10 +8,10 @@ type CreateParams struct {
 }
 
 type SearchParams struct {
-	Name  string
-	Email string
-	Limit int
-	Page  int
+	Name  string `query:"name"`
+	Email string `query:"email"`
+	Limit int    `query:"page_size"`
+	Page  int    `query:"page"`
 }
 
 type PaginationParams struct {

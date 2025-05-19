@@ -11,5 +11,5 @@ func Route(apiV1 fiber.Router, container *application.Container) {
 	v1Dashboard := apiV1.Group("/dashboard", middleware.Only(user.TypeAdmin))
 
 	usersRouter(v1Dashboard, container.Admin.UserService)
-	//authRouter(apiV1, container.Admin.AuthService)
+	authRouter(apiV1, container.Admin.AuthService)
 }

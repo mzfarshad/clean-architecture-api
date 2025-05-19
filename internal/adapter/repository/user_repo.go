@@ -3,10 +3,9 @@ package repository
 import (
 	"context"
 	"fmt"
+	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	"github.com/mzfarshad/music_store_api/pkg/dto"
 	"github.com/mzfarshad/music_store_api/pkg/errs"
-
-	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -71,6 +70,7 @@ func (r *userRepo) Find(ctx context.Context, params user.SearchParams) (*user.Pa
 	if params.Name != "" {
 		query = query.Where("name ILIKE ?", fmt.Sprintf("%%%s%%", params.Name))
 	}
+	query = query.Where("type = ?", user.TypeCustomer)
 	if err := query.Count(&totalData).Error; err != nil {
 		return nil, errs.Handle(err, gormErrHandler("user"))
 	}

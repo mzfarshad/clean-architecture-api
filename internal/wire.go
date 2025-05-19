@@ -26,6 +26,7 @@ func NewContainer() (*application.Container, error) {
 
 		// admin services
 		admin.NewUserService,
+		admin.NewAuthService,
 
 		// application container
 		application.NewContainer,

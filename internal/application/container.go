@@ -7,6 +7,7 @@ import (
 
 type admin struct {
 	UserService user.AdminUseCase
+	AuthService auth.AdminUseCase
 }
 
 type customer struct {
@@ -19,7 +20,7 @@ type share struct {
 }
 
 type cli struct {
-	// For future when we need to implement a cli tool in different domain bounded contexts
+	// For future when we need to use a service in another service preventing import cycle
 }
 
 type Container struct {
@@ -34,17 +35,19 @@ func NewContainer(
 
 	// Admin Services
 	adminUserService user.AdminUseCase,
+	adminAuthService auth.AdminUseCase,
 
 	// Customer Services
 	authService auth.CustomerUseCase,
 	userService user.CustomerUseCase,
 
-	// Other Use Cases
+	// Cli service
 
 ) *Container {
 	return &Container{
 		Admin: admin{
 			UserService: adminUserService,
+			AuthService: adminAuthService,
 		},
 		Customer: customer{
 			AuthService: authService,

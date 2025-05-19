@@ -54,3 +54,23 @@ func (Request[T]) ParseParams(ctx *fiber.Ctx) (*T, error) {
 	}
 	return &params, nil
 }
+
+// ParseQueries binds the request Queries string of *fiber.Ctx into the given DTO struct and validates it.
+// It returns a non-nil pointer of the given queries or error.
+func (Request[T]) ParseQueries(ctx *fiber.Ctx) (*T, error) {
+	var queries T
+	if err := ctx.QueryParser(&queries); err != nil {
+		return nil, errs.New(errs.Unprocessable, "unprocessable request params").CausedBy(err)
+	}
+	if &queries == nil {
+		return nil, errParsingParams
+	}
+	if err := validate.Struct(queries); err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
+			return nil, err
+		}
+		errorList := err.(validator.ValidationErrors)
+		return nil, errs.New(errs.Validation, errorList.Error()).CausedBy(err)
+	}
+	return &queries, nil
+}
