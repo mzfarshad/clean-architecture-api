@@ -5,19 +5,6 @@ import (
 	"github.com/mzfarshad/music_store_api/rest"
 )
 
-func NewSuccessResponse(id uint, msg string) *SuccessResponse {
-	return &SuccessResponse{
-		Message: msg,
-		UserId:  id,
-	}
-}
-
-type SuccessResponse struct {
-	rest.DTO `json:"_"`
-	Message  string `json:"message,omitempty"`
-	UserId   uint   `json:"user_id,omitempty"`
-}
-
 type User struct {
 	rest.DTO
 	Id             uint   `json:"id"`

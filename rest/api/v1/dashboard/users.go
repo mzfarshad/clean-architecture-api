@@ -43,7 +43,7 @@ func deactivateUser(userService user.AdminUseCase) fiber.Handler {
 		if err := userService.DeactivateUser(ctx.Context(), userId.Id, reason.Reason); err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		return rest.NewSuccess(presenter.NewSuccessResponse(userId.Id, "User deactivated successfully")).Handle(ctx)
+		return rest.NewSuccess(nil).Handle(ctx)
 	}
 }
 
@@ -61,7 +61,7 @@ func reactivateUser(userService user.AdminUseCase) fiber.Handler {
 		if err := userService.ReactivateUser(ctx.Context(), input.Id); err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		return rest.NewSuccess(presenter.NewSuccessResponse(input.Id, "User reactivated successfully")).Handle(ctx)
+		return rest.NewSuccess(nil).Handle(ctx)
 	}
 }
 
@@ -80,7 +80,7 @@ func updateMyProfile(userService user.AdminUseCase) fiber.Handler {
 		if err := userService.UpdateMyProfile(ctx.Context(), input.Name, input.Email); err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		return rest.NewSuccess(presenter.NewSuccessResponse(0, "User updated successfully")).Handle(ctx)
+		return rest.NewSuccess(nil).Handle(ctx)
 	}
 }
 
