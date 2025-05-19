@@ -1,7 +1,6 @@
 package application
 
 import (
-	admincmd "github.com/mzfarshad/music_store_api/internal/application/cli/admin_cmd"
 	"github.com/mzfarshad/music_store_api/internal/domain/auth"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 )
@@ -21,7 +20,7 @@ type share struct {
 }
 
 type cli struct {
-	AdminCli admincmd.Service
+	// For future when we need to use a service in another service preventing import cycle
 }
 
 type Container struct {
@@ -43,7 +42,6 @@ func NewContainer(
 	userService user.CustomerUseCase,
 
 	// Cli service
-	adminCmdService admincmd.Service,
 
 ) *Container {
 	return &Container{
@@ -56,8 +54,6 @@ func NewContainer(
 			UserService: userService,
 		},
 		Share: share{},
-		Cli: cli{
-			AdminCli: adminCmdService,
-		},
+		Cli:   cli{},
 	}
 }
