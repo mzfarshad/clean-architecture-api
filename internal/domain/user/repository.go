@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"github.com/mzfarshad/music_store_api/internal/domain"
 	"github.com/mzfarshad/music_store_api/pkg/search"
 )
 
@@ -33,8 +34,9 @@ type SearchParams struct {
 }
 
 type CreateParams struct {
-	Name     string
-	Email    string
-	Password string
-	Type     Type
+	domain.Validatable
+	Name     string `validate:"required"`
+	Email    string `validate:"required"`
+	Password string `validate:"required"`
+	Type     Type   `validate:"required,oneof:customer"`
 }

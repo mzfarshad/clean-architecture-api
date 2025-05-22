@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"github.com/mzfarshad/music_store_api/internal/domain"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	"github.com/mzfarshad/music_store_api/pkg/errs"
 	"golang.org/x/crypto/bcrypt"
@@ -9,6 +10,9 @@ import (
 )
 
 func (r *userRepo) Create(ctx context.Context, params user.CreateParams) (*user.Entity, error) {
+	if err := domain.Validate(params); err != nil {
+		return nil, err
+	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(params.Password), 16)
 	if err != nil {
 		return nil, err
@@ -19,9 +23,7 @@ func (r *userRepo) Create(ctx context.Context, params user.CreateParams) (*user.
 		PasswordHash: string(hash),
 		Type:         params.Type,
 	}
-	err = r.db.WithContext(ctx).
-		Clauses(clause.Returning{}).
-		Create(&model).Error
+	err = r.db.WithContext(ctx).Clauses(clause.Returning{}).Create(&model).Error
 	if err != nil {
 		return nil, errs.Handle(err, gormErrHandler("user"))
 	}
