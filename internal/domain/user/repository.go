@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"github.com/mzfarshad/music_store_api/internal/domain"
+	"github.com/mzfarshad/music_store_api/pkg/dto"
 	"github.com/mzfarshad/music_store_api/pkg/search"
 )
 
@@ -17,8 +18,8 @@ type Query interface {
 }
 
 type Command interface {
-	Create(ctx context.Context, params CreateParams) (*Entity, error)
-	Update(ctx context.Context, entity *Entity) error
+	Create(context.Context, CreateParams) (*Entity, error)
+	Update(context.Context, UpdateParams) (*Entity, error)
 }
 
 type Where struct {
@@ -39,4 +40,14 @@ type CreateParams struct {
 	Email    string `validate:"required"`
 	Password string `validate:"required"`
 	Type     Type   `validate:"required,oneof:customer"`
+}
+
+type UpdateParams struct {
+	domain.Validatable
+	Where struct {
+		Id uint `validate:"required"`
+	}
+	Name           string
+	InactiveReason string
+	Active         dto.Optional[bool]
 }

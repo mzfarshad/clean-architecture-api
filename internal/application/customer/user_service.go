@@ -16,21 +16,19 @@ type userService struct {
 	userRepo user.Repository
 }
 
-func (s *userService) UpdateMyName(ctx context.Context, name string) error {
+func (s *userService) UpdateMyName(ctx context.Context, name string) (*user.Entity, error) {
 	claims, err := auth.MustClaimed(ctx, user.TypeCustomer)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	customer, err := s.userRepo.First(ctx, user.Where{
 		Id:   claims.ID,
 		Type: user.TypeCustomer,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	customer.Name = name
-	if err = s.userRepo.Update(ctx, customer); err != nil {
-		return err
-	}
-	return nil
+	updateParams := user.UpdateParams{Name: name}
+	updateParams.Where.Id = customer.Id
+	return s.userRepo.Update(ctx, updateParams)
 }

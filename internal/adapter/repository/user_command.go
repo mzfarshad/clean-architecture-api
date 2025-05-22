@@ -30,15 +30,29 @@ func (r *userRepo) Create(ctx context.Context, params user.CreateParams) (*user.
 	return mapUserToEntity(&model), nil
 }
 
-func (r *userRepo) Update(ctx context.Context, entity *user.Entity) error {
+func (r *userRepo) Update(ctx context.Context, params user.UpdateParams) (*user.Entity, error) {
+	if err := domain.Validate(params); err != nil {
+		return nil, err
+	}
+	updates := make(map[string]any)
+	if params.InactiveReason != "" {
+		updates["inactive_reason"] = params.InactiveReason
+	}
+	if params.Active.Populated() {
+		updates["active"] = params.Active.Value()
+	}
+
+	if len(updates) == 0 {
+		return r.First(ctx, user.Where{Id: params.Where.Id})
+	}
+	var model User
 	err := r.db.WithContext(ctx).
-		Model(&User{}).
-		Where("id = ?", entity.Id).
-		Updates(map[string]interface{}{
-			"name":            entity.Name,
-			"email":           entity.Email,
-			"inactive_reason": entity.InactiveReason,
-			"status":          entity.Active,
-		}).Error
-	return err
+		Model(&model).
+		Clauses(clause.Returning{}).
+		Where("id = ?", params.Where.Id).
+		Updates(updates).Error
+	if err != nil {
+		return nil, errs.Handle(err, gormErrHandler("user"))
+	}
+	return mapUserToEntity(&model), nil
 }

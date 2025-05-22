@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/mzfarshad/music_store_api/internal/domain/auth"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
+	"github.com/mzfarshad/music_store_api/pkg/dto"
+	"github.com/mzfarshad/music_store_api/pkg/errs"
 	"github.com/mzfarshad/music_store_api/pkg/search"
 )
 
@@ -18,56 +20,54 @@ type userService struct {
 	userRepo user.Repository
 }
 
-func (s *userService) DeactivateUser(ctx context.Context, userId uint, reason string) error {
+func (s *userService) DeactivateUser(ctx context.Context, userId uint, reason string) (*user.Entity, error) {
 	usr, err := s.userRepo.First(ctx, user.Where{Id: userId})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !usr.Active {
-		return fmt.Errorf("user with id %d is deactive, reason: %s", userId, usr.InactiveReason)
+		return nil, errs.New(errs.Unprocessable, fmt.Sprintf("user #%d has been already deactived because: %s", userId, usr.InactiveReason))
 	}
-	usr.Active = false
-	usr.InactiveReason = reason
-	if err := s.userRepo.Update(ctx, usr); err != nil {
-		return err
+	updateParams := user.UpdateParams{
+		InactiveReason: reason,
+		Active:         dto.NewOptional(false),
 	}
-	return nil
+	updateParams.Where.Id = userId
+	return s.userRepo.Update(ctx, updateParams)
 }
 
-func (s *userService) ReactivateUser(ctx context.Context, userId uint) error {
+func (s *userService) ReactivateUser(ctx context.Context, userId uint) (*user.Entity, error) {
 	usr, err := s.userRepo.First(ctx, user.Where{Id: userId})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if usr.Active {
-		return fmt.Errorf("user has been active")
+		return usr, nil
 	}
-	usr.Active = true
-	if err = s.userRepo.Update(ctx, usr); err != nil {
-		return err
+	updateParams := user.UpdateParams{
+		Active: dto.NewOptional(true),
 	}
-	return nil
+	updateParams.Where.Id = userId
+	return s.userRepo.Update(ctx, updateParams)
 }
 
 func (s *userService) SearchInUsers(ctx context.Context, p *search.Pagination[user.SearchParams]) ([]*user.Entity, error) {
 	return s.userRepo.Search(ctx, p)
 }
 
-func (s *userService) UpdateMyProfile(ctx context.Context, name string) error {
+func (s *userService) UpdateMyProfile(ctx context.Context, name string) (*user.Entity, error) {
 	claims, err := auth.MustClaimed(ctx, user.TypeAdmin)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	usr, err := s.userRepo.First(ctx, user.Where{
 		Id:   claims.ID,
 		Type: claims.UserType,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	usr.Name = name
-	if err = s.userRepo.Update(ctx, usr); err != nil {
-		return err
-	}
-	return nil
+	updateParams := user.UpdateParams{Name: name}
+	updateParams.Where.Id = usr.Id
+	return s.userRepo.Update(ctx, updateParams)
 }
