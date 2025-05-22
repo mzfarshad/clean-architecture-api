@@ -1,5 +1,12 @@
 package domain
 
+func UserTypes() []string {
+	return []string{
+		Admin.String(),
+		Customer.String(),
+	}
+}
+
 // UserType is the user type includes Customer, Admin.
 type UserType string
 

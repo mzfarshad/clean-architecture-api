@@ -20,7 +20,7 @@ func Migrate(db *gorm.DB) error {
 }
 
 func beforeMigrate(db *gorm.DB) error {
-	if err := createEnum(db, "user_type", string(domain.Admin), string(domain.Customer)); err != nil {
+	if err := createEnum(db, "user_type", domain.UserTypes()...); err != nil {
 		return err
 	}
 	return nil
