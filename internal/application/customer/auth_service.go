@@ -27,6 +27,9 @@ func (s *authService) SignIn(ctx context.Context, email, password string) (*auth
 	if customer == nil {
 		return nil, errs.New(errs.NotFound, "customer not found")
 	}
+	if !customer.Active {
+		return nil, errs.New(errs.Unauthorized, "your account has been deactivated")
+	}
 	if err = customer.CompareHashAndPassword(password); err != nil {
 		return nil, err
 	}
