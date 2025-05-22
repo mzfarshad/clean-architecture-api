@@ -24,22 +24,22 @@ type Command interface {
 
 type Where struct {
 	Id    uint
-	Type  Type
+	Type  domain.UserType
 	Email string
 }
 
 type SearchParams struct {
-	Name  string `query:"name"`
-	Email string `query:"email"`
-	Type  Type   `query:"type"`
+	Name  string          `query:"name"`
+	Email string          `query:"email"`
+	Type  domain.UserType `query:"type"`
 }
 
 type CreateParams struct {
 	domain.Validatable
-	Name     string `validate:"required"`
-	Email    string `validate:"required"`
-	Password string `validate:"required"`
-	Type     Type   `validate:"required,oneof:customer"`
+	Name     string          `validate:"required"`
+	Email    string          `validate:"required"`
+	Password string          `validate:"required"`
+	Type     domain.UserType `validate:"required,oneof:customer"`
 }
 
 type UpdateParams struct {

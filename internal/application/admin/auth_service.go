@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"github.com/mzfarshad/music_store_api/internal/domain"
 	"github.com/mzfarshad/music_store_api/internal/domain/auth"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 )
@@ -19,7 +20,7 @@ type authService struct {
 func (s *authService) SingIn(ctx context.Context, email, password string) (*auth.PairToken, error) {
 	admin, err := s.repo.First(ctx, user.Where{
 		Email: email,
-		Type:  user.TypeAdmin,
+		Type:  domain.Admin,
 	})
 	if err != nil {
 		return nil, err

@@ -11,7 +11,7 @@ type Entity struct {
 	Email          string
 	passwordHash   string
 	InactiveReason string
-	Type           Type
+	Type           domain.UserType
 	Active         bool
 }
 

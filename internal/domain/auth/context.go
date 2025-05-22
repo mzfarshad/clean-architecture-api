@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
-	"github.com/mzfarshad/music_store_api/internal/domain/user"
+	"github.com/mzfarshad/music_store_api/internal/domain"
 	"github.com/mzfarshad/music_store_api/pkg/errs"
 )
 
@@ -13,7 +13,7 @@ const (
 	CtxKeyAuthUser ctxKey = "Auth-User"
 )
 
-func MustClaimed(ctx context.Context, roles ...user.Type) (*UserClaims, error) {
+func MustClaimed(ctx context.Context, roles ...domain.UserType) (*UserClaims, error) {
 	claims, exists := ctx.Value(CtxKeyAuthUser).(*UserClaims)
 	if !exists {
 		return nil, errs.New(errs.Unauthorized, "you're not authenticated")

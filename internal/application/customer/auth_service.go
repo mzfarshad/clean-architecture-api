@@ -3,6 +3,7 @@ package customer
 import (
 	"context"
 	"errors"
+	"github.com/mzfarshad/music_store_api/internal/domain"
 	"github.com/mzfarshad/music_store_api/internal/domain/auth"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	"github.com/mzfarshad/music_store_api/pkg/errs"
@@ -19,7 +20,7 @@ type authService struct {
 func (s *authService) SignIn(ctx context.Context, email, password string) (*auth.PairToken, error) {
 	customer, err := s.userRepo.First(ctx, user.Where{
 		Email: email,
-		Type:  user.TypeCustomer,
+		Type:  domain.Customer,
 	})
 	if err != nil {
 		return nil, err
@@ -54,7 +55,7 @@ func (s *authService) Signup(ctx context.Context, name, email, password string) 
 		Name:     name,
 		Email:    email,
 		Password: password,
-		Type:     user.TypeCustomer,
+		Type:     domain.Customer,
 	})
 	if err != nil {
 		return nil, err

@@ -3,13 +3,13 @@ package middleware
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/mzfarshad/music_store_api/internal/domain"
 	"github.com/mzfarshad/music_store_api/internal/domain/auth"
-	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	"github.com/mzfarshad/music_store_api/pkg/errs"
 	"github.com/mzfarshad/music_store_api/rest"
 )
 
-func Only(userTypes ...user.Type) fiber.Handler {
+func Only(userTypes ...domain.UserType) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		userClaims, ok := ctx.Context().UserValue(auth.CtxKeyAuthUser).(*auth.UserClaims)
 		if !ok {

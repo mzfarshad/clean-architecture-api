@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/mzfarshad/music_store_api/internal/domain"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	"gorm.io/gorm"
 )
@@ -21,7 +22,7 @@ type User struct {
 	Email          string `gorm:"unique"`
 	PasswordHash   string
 	InactiveReason string
-	Type           user.Type `gorm:"type:user_type;default:customer"`
+	Type           domain.UserType `gorm:"type:user_type;default:customer"`
 
 	Active bool `gorm:"default:true"`
 }

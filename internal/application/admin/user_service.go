@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 	"fmt"
+	"github.com/mzfarshad/music_store_api/internal/domain"
 	"github.com/mzfarshad/music_store_api/internal/domain/auth"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	"github.com/mzfarshad/music_store_api/pkg/dto"
@@ -56,7 +57,7 @@ func (s *userService) SearchInUsers(ctx context.Context, p *search.Pagination[us
 }
 
 func (s *userService) UpdateMyProfile(ctx context.Context, name string) (*user.Entity, error) {
-	claims, err := auth.MustClaimed(ctx, user.TypeAdmin)
+	claims, err := auth.MustClaimed(ctx, domain.Admin)
 	if err != nil {
 		return nil, err
 	}
