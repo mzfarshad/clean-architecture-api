@@ -2,27 +2,34 @@ package customer
 
 import (
 	"context"
-
+	"github.com/mzfarshad/music_store_api/internal/domain/auth"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 )
 
 func NewUserService(userRepo user.Repository) user.CustomerUseCase {
-	return &customerService{
+	return &userService{
 		userRepo: userRepo,
 	}
 }
 
-type customerService struct {
+type userService struct {
 	userRepo user.Repository
 }
 
-func (s *customerService) UpdateMyName(ctx context.Context, name, email string) error {
-	usr, err := s.userRepo.FirstByEmail(ctx, email)
+func (s *userService) UpdateMyName(ctx context.Context, name string) error {
+	claims, err := auth.MustClaimed(ctx, user.TypeCustomer)
 	if err != nil {
 		return err
 	}
-	usr.Name = name
-	if err := s.userRepo.Update(ctx, usr); err != nil {
+	customer, err := s.userRepo.First(ctx, user.Where{
+		Id:   claims.ID,
+		Type: user.TypeCustomer,
+	})
+	if err != nil {
+		return err
+	}
+	customer.Name = name
+	if err = s.userRepo.Update(ctx, customer); err != nil {
 		return err
 	}
 	return nil

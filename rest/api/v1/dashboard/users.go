@@ -68,7 +68,6 @@ func reactivateUser(userService user.AdminUseCase) fiber.Handler {
 type updateProfile struct {
 	rest.DTO `json:"_"`
 	Name     string `json:"name" validate:"required"`
-	Email    string `json:"email" validate:"required"`
 }
 
 func updateMyProfile(userService user.AdminUseCase) fiber.Handler {
@@ -77,7 +76,7 @@ func updateMyProfile(userService user.AdminUseCase) fiber.Handler {
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		if err := userService.UpdateMyProfile(ctx.Context(), input.Name, input.Email); err != nil {
+		if err = userService.UpdateMyProfile(ctx.Context(), input.Name); err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
 		return rest.NewSuccess(nil).Handle(ctx)

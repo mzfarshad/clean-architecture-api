@@ -36,7 +36,7 @@ func (r *userRepo) Update(ctx context.Context, entity *user.Entity) error {
 			"name":            entity.Name,
 			"email":           entity.Email,
 			"inactive_reason": entity.InactiveReason,
-			"status":          entity.Status,
+			"status":          entity.Active,
 		}).Error
 	return err
 }

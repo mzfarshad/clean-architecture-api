@@ -19,3 +19,5 @@ func (x Type) Is(target Type, or ...Type) bool {
 	}
 	return false
 }
+
+func (x Type) String() string { return string(x) }

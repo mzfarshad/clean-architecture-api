@@ -16,18 +16,21 @@ type authService struct {
 	userRepo user.Repository
 }
 
-func (s authService) SignIn(ctx context.Context, email, password string) (*auth.PairToken, error) {
-	usr, err := s.userRepo.FirstByEmail(ctx, email)
+func (s *authService) SignIn(ctx context.Context, email, password string) (*auth.PairToken, error) {
+	customer, err := s.userRepo.First(ctx, user.Where{
+		Email: email,
+		Type:  user.TypeCustomer,
+	})
 	if err != nil {
 		return nil, err
 	}
-	if usr == nil {
+	if customer == nil {
+		return nil, errs.New(errs.NotFound, "customer not found")
+	}
+	if err = customer.CompareHashAndPassword(password); err != nil {
 		return nil, err
 	}
-	if err = usr.CompareHashAndPassword(password); err != nil {
-		return nil, err
-	}
-	access, err := auth.NewAccessToken(usr.Email, usr.Type, usr.Id)
+	access, err := auth.NewAccessToken(customer.Email, customer.Type, customer.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -36,23 +39,22 @@ func (s authService) SignIn(ctx context.Context, email, password string) (*auth.
 	}, nil
 }
 
-func (s authService) Signup(ctx context.Context, name, email, password string) (*auth.PairToken, error) {
-	var customer user.CreateParams
-	usrByEmail, err := s.userRepo.FirstByEmail(ctx, email)
+func (s *authService) Signup(ctx context.Context, name, email, password string) (*auth.PairToken, error) {
+	usrByEmail, err := s.userRepo.First(ctx, user.Where{Email: email})
 	if err != nil && !errors.Is(err, errs.NotFound.Err()) {
 		return nil, err
 	}
 	if usrByEmail != nil { // user exists
 		return nil, errs.New(errs.Duplication, "email already taken")
 	}
-	customer.Email = email
-	customer.Name = name
-	customer.Password = password
-	customer.Type = user.TypeCustomer
-
-	usr, err := s.userRepo.Create(ctx, customer)
+	usr, err := s.userRepo.Create(ctx, user.CreateParams{
+		Name:     name,
+		Email:    email,
+		Password: password,
+		Type:     user.TypeCustomer,
+	})
 	if err != nil {
-		return nil, errs.New(errs.Internal, "some thing wrong")
+		return nil, err
 	}
 	access, err := auth.NewAccessToken(usr.Email, usr.Type, usr.Id)
 	if err != nil {

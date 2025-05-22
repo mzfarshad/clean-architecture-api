@@ -2,7 +2,6 @@ package admin
 
 import (
 	"context"
-	"errors"
 	"github.com/mzfarshad/music_store_api/internal/domain/auth"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 )
@@ -18,9 +17,12 @@ type authService struct {
 }
 
 func (s *authService) SingIn(ctx context.Context, email, password string) (*auth.PairToken, error) {
-	admin, err := s.repo.FirstByEmail(ctx, email)
+	admin, err := s.repo.First(ctx, user.Where{
+		Email: email,
+		Type:  user.TypeAdmin,
+	})
 	if err != nil {
-		return nil, errors.New("not found admin")
+		return nil, err
 	}
 	if err = admin.CompareHashAndPassword(password); err != nil {
 		return nil, err

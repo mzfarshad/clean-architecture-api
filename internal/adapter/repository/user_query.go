@@ -8,11 +8,20 @@ import (
 	"github.com/mzfarshad/music_store_api/pkg/errs"
 )
 
-func (r *userRepo) FirstByEmail(ctx context.Context, email string) (*user.Entity, error) {
+func (r *userRepo) First(ctx context.Context, where user.Where) (*user.Entity, error) {
+	query := r.db.WithContext(ctx)
+	if where.Id != 0 {
+		query.Where("id = ?", where.Id)
+	}
+	if where.Type != "" {
+		query.Where("type = ?", where.Type)
+	}
+	if where.Email != "" {
+		query.Where("email = ?", where.Email)
+	}
 	var model User
-	err := r.db.WithContext(ctx).Where("email = ?", email).First(&model).Error
-	if err != nil {
-		return nil, errs.Handle(err, gormErrHandler("user"))
+	if err := query.First(&model).Error; err != nil {
+		return nil, errs.Handle(err, gormErrHandler(model.Type.String()))
 	}
 	return mapUserToEntity(&model), nil
 }

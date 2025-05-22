@@ -22,7 +22,8 @@ type User struct {
 	PasswordHash   string
 	InactiveReason string
 	Type           user.Type `gorm:"type:user_type;default:customer"`
-	Status         bool      `gorm:"default:true"`
+
+	Active bool `gorm:"default:true"`
 }
 
 func mapUserToEntity(m *User) *user.Entity {
@@ -31,7 +32,7 @@ func mapUserToEntity(m *User) *user.Entity {
 		Email:          m.Email,
 		InactiveReason: m.InactiveReason,
 		Type:           m.Type,
-		Status:         m.Status,
+		Active:         m.Active,
 	}
 	entity.SetPasswordHash(m.PasswordHash)
 	return entity
