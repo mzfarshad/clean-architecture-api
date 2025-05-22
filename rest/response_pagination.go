@@ -25,9 +25,6 @@ func NewPagination[T any](ctx *fiber.Ctx) (*search.Pagination[T], error) {
 	if err = ctx.QueryParser(&p.Query); err != nil {
 		return nil, err
 	}
-	if err = ctx.ParamsParser(&p.Param); err != nil {
-		return nil, err
-	}
 
 	return p, nil
 }

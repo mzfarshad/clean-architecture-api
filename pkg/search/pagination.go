@@ -7,7 +7,6 @@ func NewPagination[T any](size, page int) *Pagination[T] {
 type Pagination[T any] struct {
 	// inputs
 	Query T
-	Param T
 	size  int
 	page  int
 	// results
