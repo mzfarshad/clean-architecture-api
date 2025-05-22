@@ -5,6 +5,16 @@ import (
 	"gorm.io/gorm"
 )
 
+func NewUserRepo(db *gorm.DB) user.Repository {
+	return &userRepo{
+		db: db,
+	}
+}
+
+type userRepo struct {
+	db *gorm.DB
+}
+
 type User struct {
 	gorm.Model
 	Name           string
