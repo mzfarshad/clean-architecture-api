@@ -1,12 +1,15 @@
 package user
 
-import "context"
+import (
+	"context"
+	"github.com/mzfarshad/music_store_api/pkg/search"
+)
 
 // AdminUseCase represents what an TypeAdmin can do with user Entity.
 type AdminUseCase interface {
 	ReactivateUser(ctx context.Context, userId uint) error
 	DeactivateUser(ctx context.Context, userId uint, reason string) error
-	SearchInUsers(ctx context.Context, params SearchParams) (*PaginationParams, error)
+	SearchInUsers(context.Context, *search.Pagination[SearchParams]) ([]*Entity, error)
 	UpdateMyProfile(ctx context.Context, name string) error
 }
 

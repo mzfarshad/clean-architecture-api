@@ -7,13 +7,7 @@ import (
 	"github.com/mzfarshad/music_store_api/rest/presenter"
 )
 
-const (
-	DefaultPageSize = 20
-	DefaultPage     = 1
-)
-
 func usersRouter(v1Dashboard fiber.Router, userService user.AdminUseCase) {
-	// TODO
 	users := v1Dashboard.Group("/users")
 	users.Get("", searchInUsers(userService))
 	users.Put("/updateMyProfile", updateMyProfile(userService))
@@ -89,22 +83,12 @@ func searchInUsers(userService user.AdminUseCase) fiber.Handler {
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-
-		if pagination.Size() < 1 {
-			pagination.Query.Limit = DefaultPageSize
-		}
-		if pagination.Page() < 1 {
-			pagination.Query.Page = DefaultPage
-		}
-
-		pagesData, err := userService.SearchInUsers(ctx.Context(), pagination.Query)
+		users, err := userService.SearchInUsers(ctx.Context(), pagination)
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-
-		dtoPagesData := rest.NewList(pagesData.Result, presenter.NewUser)
-		pagination.WithTotal(int64(pagesData.TotalData))
-
-		return rest.NewSuccess(dtoPagesData).Paginate(pagination).Handle(ctx)
+		return rest.NewSuccess(
+			rest.NewList(users, presenter.NewUser),
+		).Paginate(pagination).Handle(ctx)
 	}
 }

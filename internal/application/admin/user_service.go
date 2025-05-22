@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mzfarshad/music_store_api/internal/domain/auth"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
+	"github.com/mzfarshad/music_store_api/pkg/search"
 )
 
 func NewUserService(userRepo user.Repository) user.AdminUseCase {
@@ -42,19 +43,14 @@ func (s *userService) ReactivateUser(ctx context.Context, userId uint) error {
 		return fmt.Errorf("user has been active")
 	}
 	usr.Active = true
-	if err := s.userRepo.Update(ctx, usr); err != nil {
+	if err = s.userRepo.Update(ctx, usr); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *userService) SearchInUsers(ctx context.Context,
-	params user.SearchParams) (*user.PaginationParams, error) {
-	usrPagination, err := s.userRepo.Find(ctx, params)
-	if err != nil {
-		return nil, err
-	}
-	return usrPagination, nil
+func (s *userService) SearchInUsers(ctx context.Context, p *search.Pagination[user.SearchParams]) ([]*user.Entity, error) {
+	return s.userRepo.Search(ctx, p)
 }
 
 func (s *userService) UpdateMyProfile(ctx context.Context, name string) error {

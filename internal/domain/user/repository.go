@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"github.com/mzfarshad/music_store_api/pkg/search"
 )
 
 type Repository interface {
@@ -11,7 +12,7 @@ type Repository interface {
 
 type Query interface {
 	First(context.Context, Where) (*Entity, error)
-	Find(context.Context, SearchParams) (*PaginationParams, error)
+	Search(context.Context, *search.Pagination[SearchParams]) ([]*Entity, error)
 }
 
 type Command interface {
@@ -23,4 +24,17 @@ type Where struct {
 	Id    uint
 	Type  Type
 	Email string
+}
+
+type SearchParams struct {
+	Name  string `query:"name"`
+	Email string `query:"email"`
+	Type  Type   `query:"type"`
+}
+
+type CreateParams struct {
+	Name     string
+	Email    string
+	Password string
+	Type     Type
 }

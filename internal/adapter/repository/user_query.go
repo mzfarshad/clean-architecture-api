@@ -2,10 +2,12 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/mzfarshad/music_store_api/internal/domain/user"
 	"github.com/mzfarshad/music_store_api/pkg/dto"
 	"github.com/mzfarshad/music_store_api/pkg/errs"
+	"github.com/mzfarshad/music_store_api/pkg/search"
 )
 
 func (r *userRepo) First(ctx context.Context, where user.Where) (*user.Entity, error) {
@@ -35,29 +37,28 @@ func (r *userRepo) FirstById(ctx context.Context, id uint) (*user.Entity, error)
 	return mapUserToEntity(&model), nil
 }
 
-func (r *userRepo) Find(ctx context.Context, params user.SearchParams) (*user.PaginationParams, error) {
-	var users []*User
-	var totalData int64
-	var totalPages int
+func (r *userRepo) Search(ctx context.Context, p *search.Pagination[user.SearchParams]) ([]*user.Entity, error) {
+	if p == nil {
+		return nil, errors.New("trying to search in users with nil pagination")
+	}
 	query := r.db.WithContext(ctx).Model(&User{})
-	if params.Email != "" {
-		query = query.Where("email ILIKE ?", fmt.Sprintf("%%%s%%", params.Email))
+	if p.Query.Name != "" {
+		query = query.Where("name ILIKE ?", fmt.Sprintf("%%%s%%", p.Query.Name))
 	}
-	if params.Name != "" {
-		query = query.Where("name ILIKE ?", fmt.Sprintf("%%%s%%", params.Name))
+	if p.Query.Email != "" {
+		query = query.Where("email ILIKE ?", fmt.Sprintf("%%%s%%", p.Query.Email))
 	}
-	query = query.Where("type = ?", user.TypeCustomer)
-	if err := query.Count(&totalData).Error; err != nil {
+	if p.Query.Type != "" {
+		query = query.Where("type = ?", p.Query.Type)
+	}
+	var count int64
+	if err := query.Count(&count).Error; err != nil {
 		return nil, errs.Handle(err, gormErrHandler("user"))
 	}
-	totalPages = int((totalData + int64(params.Limit) - 1) / int64(params.Limit))
-	ofst := (params.Page - 1) * params.Limit
-	if err := query.Limit(params.Limit).Offset(ofst).Find(&users).Error; err != nil {
-		return nil, err
+	p.WithTotal(count)
+	var models []*User
+	if err := query.Limit(p.Limit()).Offset(p.Offset()).Find(&models).Error; err != nil {
+		return nil, errs.Handle(err, gormErrHandler("user"))
 	}
-	return &user.PaginationParams{
-		TotalData:  int(totalData),
-		TotalPages: totalPages,
-		Result:     dto.List(users, mapUserToEntity),
-	}, nil
+	return dto.List(models, mapUserToEntity), nil
 }
