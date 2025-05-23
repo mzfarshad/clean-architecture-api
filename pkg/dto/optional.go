@@ -15,12 +15,10 @@ type Optional[T optionalTypes] struct {
 	populated bool
 }
 
-// IsPopulated returns true if the value of the Optional is populated.
-func (t *Optional[T]) IsPopulated() bool {
-	return t.populated
-}
+// Populated returns true if the value of the Optional is populated.
+func (t *Optional[T]) Populated() bool { return t.populated }
 
 // Value returns the value of the Optional type.
 // If the value is not populated, it will return the zero value of the type.
-// Check if the value is populated using IsPopulated.
+// Check if the value is populated using Populated.
 func (t *Optional[T]) Value() T { return t.value }

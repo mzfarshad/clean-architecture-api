@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/mzfarshad/music_store_api/internal/domain/user"
+	"github.com/mzfarshad/music_store_api/internal/domain"
 	"gorm.io/gorm"
 )
 
@@ -20,7 +20,7 @@ func Migrate(db *gorm.DB) error {
 }
 
 func beforeMigrate(db *gorm.DB) error {
-	if err := createEnum(db, "user_type", string(user.TypeAdmin), string(user.TypeCustomer)); err != nil {
+	if err := createEnum(db, "user_type", domain.UserTypes()...); err != nil {
 		return err
 	}
 	return nil

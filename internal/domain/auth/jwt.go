@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/mzfarshad/music_store_api/config"
-	"github.com/mzfarshad/music_store_api/internal/domain/user"
+	"github.com/mzfarshad/music_store_api/internal/domain"
 	apperr "github.com/mzfarshad/music_store_api/pkg/appErr"
 	"time"
 )
@@ -21,11 +21,11 @@ var (
 type UserClaims struct {
 	jwt.RegisteredClaims
 	Email    string
-	UserType user.Type
+	UserType domain.UserType
 	ID       uint
 }
 
-func NewAccessToken(email string, userType user.Type, id uint) (*Token, error) {
+func NewAccessToken(email string, userType domain.UserType, id uint) (*Token, error) {
 	cfg := config.Get()
 	now := time.Now()
 	expiresAt := now.Add(cfg.Jwt.Access.TTL)

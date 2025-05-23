@@ -20,6 +20,6 @@ func NewUser(entity *user.Entity) *User {
 		Name:           entity.Name,
 		Email:          entity.Email,
 		InactiveReason: entity.InactiveReason,
-		Status:         entity.Status,
+		Status:         entity.Active,
 	}
 }

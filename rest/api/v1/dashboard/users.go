@@ -7,13 +7,7 @@ import (
 	"github.com/mzfarshad/music_store_api/rest/presenter"
 )
 
-const (
-	DefaultPageSize = 20
-	DefaultPage     = 1
-)
-
 func usersRouter(v1Dashboard fiber.Router, userService user.AdminUseCase) {
-	// TODO
 	users := v1Dashboard.Group("/users")
 	users.Get("", searchInUsers(userService))
 	users.Put("/updateMyProfile", updateMyProfile(userService))
@@ -40,10 +34,11 @@ func deactivateUser(userService user.AdminUseCase) fiber.Handler {
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		if err := userService.DeactivateUser(ctx.Context(), userId.Id, reason.Reason); err != nil {
+		usr, err := userService.DeactivateUser(ctx.Context(), userId.Id, reason.Reason)
+		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		return rest.NewSuccess(nil).Handle(ctx)
+		return rest.NewSuccess(presenter.NewUser(usr)).Handle(ctx)
 	}
 }
 
@@ -58,17 +53,17 @@ func reactivateUser(userService user.AdminUseCase) fiber.Handler {
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		if err := userService.ReactivateUser(ctx.Context(), input.Id); err != nil {
+		usr, err := userService.ReactivateUser(ctx.Context(), input.Id)
+		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		return rest.NewSuccess(nil).Handle(ctx)
+		return rest.NewSuccess(presenter.NewUser(usr)).Handle(ctx)
 	}
 }
 
 type updateProfile struct {
 	rest.DTO `json:"_"`
 	Name     string `json:"name" validate:"required"`
-	Email    string `json:"email" validate:"required"`
 }
 
 func updateMyProfile(userService user.AdminUseCase) fiber.Handler {
@@ -77,10 +72,11 @@ func updateMyProfile(userService user.AdminUseCase) fiber.Handler {
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		if err := userService.UpdateMyProfile(ctx.Context(), input.Name, input.Email); err != nil {
+		me, err := userService.UpdateMyProfile(ctx.Context(), input.Name)
+		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-		return rest.NewSuccess(nil).Handle(ctx)
+		return rest.NewSuccess(presenter.NewUser(me)).Handle(ctx)
 	}
 }
 
@@ -90,22 +86,12 @@ func searchInUsers(userService user.AdminUseCase) fiber.Handler {
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-
-		if pagination.Size() < 1 {
-			pagination.Query.Limit = DefaultPageSize
-		}
-		if pagination.Page() < 1 {
-			pagination.Query.Page = DefaultPage
-		}
-
-		pagesData, err := userService.SearchInUsers(ctx.Context(), pagination.Query)
+		users, err := userService.SearchInUsers(ctx.Context(), pagination)
 		if err != nil {
 			return rest.NewFailed(err).Handle(ctx)
 		}
-
-		dtoPagesData := rest.NewList(pagesData.Result, presenter.NewUser)
-		pagination.WithTotal(int64(pagesData.TotalData))
-
-		return rest.NewSuccess(dtoPagesData).Paginate(pagination).Handle(ctx)
+		return rest.NewSuccess(
+			rest.NewList(users, presenter.NewUser),
+		).Paginate(pagination).Handle(ctx)
 	}
 }
