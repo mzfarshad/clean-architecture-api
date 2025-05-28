@@ -39,7 +39,7 @@ type CreateParams struct {
 	Name     string          `validate:"required"`
 	Email    string          `validate:"required"`
 	Password string          `validate:"required"`
-	Type     domain.UserType `validate:"required,oneof:customer"`
+	Type     domain.UserType `validate:"required,oneof=customer"`
 }
 
 type UpdateParams struct {

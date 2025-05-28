@@ -13,13 +13,13 @@ import (
 func (r *userRepo) First(ctx context.Context, where user.Where) (*user.Entity, error) {
 	query := r.db.WithContext(ctx)
 	if where.Id != 0 {
-		query.Where("id = ?", where.Id)
+		query = query.Where("id = ?", where.Id)
 	}
 	if where.Type != "" {
-		query.Where("type = ?", where.Type)
+		query = query.Where("type = ?", where.Type)
 	}
 	if where.Email != "" {
-		query.Where("email = ?", where.Email)
+		query = query.Where("email = ?", where.Email)
 	}
 	var model User
 	if err := query.First(&model).Error; err != nil {
