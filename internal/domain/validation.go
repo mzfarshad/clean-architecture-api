@@ -4,7 +4,8 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-var validate = new(validator.Validate)
+// var validate = new(validator.Validate)
+var validate *validator.Validate = validator.New()
 
 type validatable interface{ validate() }
 
