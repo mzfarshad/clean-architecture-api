@@ -41,6 +41,9 @@ func (r *userRepo) Update(ctx context.Context, params user.UpdateParams) (*user.
 	if params.Active.Populated() {
 		updates["active"] = params.Active.Value()
 	}
+	if params.Name != "" {
+		updates["name"] = params.Name
+	}
 
 	if len(updates) == 0 {
 		return r.First(ctx, user.Where{Id: params.Where.Id})
